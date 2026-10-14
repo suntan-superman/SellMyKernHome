@@ -5,7 +5,8 @@
   "type": "module",
   "description": "Compliance-first seller inquiry website for Bakersfield and Kern County.",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev-safe.mjs",
+    "dev:connected": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint app components content lib scripts tests eslint.config.mjs next.config.js playwright.config.js playwright.turnstile.config.js",

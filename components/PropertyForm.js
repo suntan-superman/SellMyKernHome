@@ -11,6 +11,18 @@ const empty = {
   privacyAcknowledged: false, marketingConsent: false, propertyType: "", condition: "", occupancy: "", timing: "", comments: "", website: "",
 };
 
+function firstStepErrors(data) {
+  const next = {};
+  if (data.propertyAddress.trim().length < 4) next.propertyAddress = "Enter the property street address.";
+  if (data.propertyCity.trim().length < 2) next.propertyCity = "Enter the property city.";
+  if (!/^\d{5}(-\d{4})?$/.test(data.propertyZip.trim())) next.propertyZip = "Enter a valid ZIP code.";
+  if (data.name.trim().length < 2) next.name = "Enter your name.";
+  if (data.preferredContact === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) next.email = "Enter a valid email address.";
+  if (data.preferredContact === "phone" && data.phone.replace(/\D/g, "").length < 10) next.phone = "Enter a valid phone number.";
+  if (!data.privacyAcknowledged) next.privacyAcknowledged = "Please acknowledge the privacy notice.";
+  return next;
+}
+
 function getAttribution() {
   if (typeof window === "undefined") return {};
   const query = new URLSearchParams(window.location.search);
@@ -51,14 +63,7 @@ export default function PropertyForm({ compact = false, initialAddress = "" }) {
   }
 
   function validateFirstStep() {
-    const next = {};
-    if (data.propertyAddress.trim().length < 4) next.propertyAddress = "Enter the property street address.";
-    if (data.propertyCity.trim().length < 2) next.propertyCity = "Enter the property city.";
-    if (!/^\d{5}(-\d{4})?$/.test(data.propertyZip.trim())) next.propertyZip = "Enter a valid ZIP code.";
-    if (data.name.trim().length < 2) next.name = "Enter your name.";
-    if (data.preferredContact === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) next.email = "Enter a valid email address.";
-    if (data.preferredContact === "phone" && data.phone.replace(/\D/g, "").length < 10) next.phone = "Enter a valid phone number.";
-    if (!data.privacyAcknowledged) next.privacyAcknowledged = "Please acknowledge the privacy notice.";
+    const next = firstStepErrors(data);
     setErrors(next);
     return !Object.keys(next).length;
   }
@@ -94,6 +99,7 @@ export default function PropertyForm({ compact = false, initialAddress = "" }) {
 
   const fieldError = (name) => errors[name] ? <span className="field-error" id={`${name}-error`}>{errors[name]}</span> : null;
   const describedBy = (name) => errors[name] ? `${name}-error` : undefined;
+  const firstStepIsValid = Object.keys(firstStepErrors(data)).length === 0;
 
   return <form id="property-form" className={`property-form ${compact ? "form-compact" : ""}`} onSubmit={submit} noValidate>
     <div className="form-heading"><div><span className="form-step">Step {step} of 2</span><h2>{step === 1 ? "Tell us where to start" : "Add property details"}</h2></div><span className="secure-note"><LockKeyhole size={16} /> Private inquiry</span></div>
@@ -107,7 +113,7 @@ export default function PropertyForm({ compact = false, initialAddress = "" }) {
       {data.preferredContact === "email" ? <div className="field-wide"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" value={data.email} onChange={update} aria-invalid={Boolean(errors.email)} aria-describedby={describedBy("email")} />{fieldError("email")}</div> : <div className="field-wide"><label htmlFor="phone">Phone number</label><input id="phone" name="phone" type="tel" autoComplete="tel" value={data.phone} onChange={update} aria-invalid={Boolean(errors.phone)} aria-describedby={describedBy("phone")} />{fieldError("phone")}</div>}
       <label className="check-field field-wide"><input type="checkbox" name="privacyAcknowledged" checked={data.privacyAcknowledged} onChange={update} aria-invalid={Boolean(errors.privacyAcknowledged)} /><span>I understand GNZ Marketing will use this information to review my inquiry and contact me about this property. See the <a href="/privacy-policy" target="_blank">Privacy Policy</a>.</span></label>{fieldError("privacyAcknowledged")}
       <div className="honeypot" aria-hidden="true"><label htmlFor="website">Website</label><input id="website" name="website" tabIndex="-1" autoComplete="off" value={data.website} onChange={update} /></div>
-      <button className="button field-wide" type="button" onClick={continueForm}>Continue <ArrowRight size={18} /></button>
+      <button className="button field-wide" type="button" onClick={continueForm} disabled={!firstStepIsValid} title={!firstStepIsValid ? "Complete all required fields to continue." : undefined}>Continue <ArrowRight size={18} /></button>
     </div> : <div className="form-fields">
       <div><label htmlFor="propertyType">Property type <span>Optional</span></label><select id="propertyType" name="propertyType" value={data.propertyType} onChange={update}><option value="">Choose one</option><option>Single-family home</option><option>Condo or townhome</option><option>Multi-unit property</option><option>Manufactured home</option><option>Other</option></select></div>
       <div><label htmlFor="condition">Approximate condition <span>Optional</span></label><select id="condition" name="condition" value={data.condition} onChange={update}><option value="">Choose one</option><option>Move-in ready</option><option>Minor updates needed</option><option>Significant repairs needed</option><option>Unsure</option></select></div>

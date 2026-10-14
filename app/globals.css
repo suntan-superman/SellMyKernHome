@@ -170,7 +170,7 @@ summary:focus-visible {
 }
 .button:disabled {
   opacity: 0.65;
-  cursor: wait;
+  cursor: not-allowed;
   transform: none;
 }
 .button-secondary {
@@ -197,21 +197,22 @@ summary:focus-visible {
 }
 .hero {
   position: relative;
-  min-height: 760px;
+  min-height: 0;
   background: var(--sage);
   display: grid;
   grid-template-columns: 48% 52%;
-  grid-template-rows: 1fr;
+  grid-template-rows: minmax(640px, auto) auto;
   overflow: hidden;
 }
 .hero-copy {
   align-self: center;
-  padding: 90px max(40px, calc((100vw - 1180px) / 2)) 220px
+  padding: 80px max(40px, calc((100vw - 1180px) / 2)) 150px
     max(40px, calc((100vw - 1180px) / 2));
   padding-right: 6vw;
 }
 .hero-copy h1 {
   max-width: 730px;
+  font-size: clamp(4rem, 6.2vw, 5.75rem);
 }
 .hero-subhead {
   max-width: 650px;
@@ -236,7 +237,7 @@ summary:focus-visible {
 }
 .hero-visual {
   position: relative;
-  min-height: 760px;
+  min-height: 640px;
 }
 .hero-visual:after {
   content: "";
@@ -252,7 +253,7 @@ summary:focus-visible {
 .image-caption {
   position: absolute;
   right: 28px;
-  bottom: 28px;
+  bottom: 132px;
   z-index: 2;
   display: flex;
   align-items: center;
@@ -265,12 +266,11 @@ summary:focus-visible {
   font-weight: 700;
 }
 .hero-form-wrap {
-  position: absolute;
-  left: max(40px, calc((100vw - 1180px) / 2));
-  bottom: 0;
+  position: relative;
+  grid-column: 1 / -1;
   z-index: 4;
-  width: min(650px, calc(100% - 80px));
-  transform: translateY(53%);
+  width: min(760px, calc(100% - 80px));
+  margin: -105px auto 72px;
 }
 .property-form {
   scroll-margin-top: 100px;
@@ -339,6 +339,10 @@ summary:focus-visible {
 .form-fields label > span:not(.field-error) {
   font-weight: 500;
   color: #62716a;
+}
+.form-fields label:not(.check-field) > span:not(.field-error) {
+  margin-left: 0.35rem;
+  font-size: 0.72rem;
 }
 .form-fields input:not([type="checkbox"]):not([type="radio"]),
 .form-fields select,
@@ -434,8 +438,7 @@ summary:focus-visible {
   }
 }
 .reassurance {
-  min-height: 230px;
-  padding: 125px 20px 48px;
+  padding: 58px 20px;
   background: var(--forest);
   color: rgba(255, 255, 255, 0.82);
   text-align: center;
@@ -799,7 +802,7 @@ summary:focus-visible {
     padding-right: 4vw;
   }
   .hero h1 {
-    font-size: 4.7rem;
+    font-size: 4rem;
   }
 }
 @media (max-width: 800px) {
@@ -847,8 +850,12 @@ summary:focus-visible {
   .hero-visual {
     min-height: 380px;
   }
+  .image-caption {
+    bottom: 66px;
+  }
   .hero-form-wrap {
     position: relative;
+    grid-column: auto;
     left: auto;
     bottom: auto;
     width: calc(100% - 28px);
