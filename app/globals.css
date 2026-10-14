@@ -381,6 +381,9 @@ summary:focus-visible {
   border-radius: 9px;
   padding: 9px 13px;
 }
+.choice-row input[type="radio"] {
+  accent-color: var(--forest);
+}
 .check-field {
   display: flex !important;
   align-items: flex-start;

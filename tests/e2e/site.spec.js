@@ -24,6 +24,19 @@ test("homepage, navigation, and seller form are accessible", async ({ page }) =>
   expect(overflow).toBeLessThanOrEqual(1);
 });
 
+test("phone contact formats as a US number and uses the brand radio accent", async ({ page }) => {
+  await page.goto("/");
+  const phoneChoice = page.getByRole("radio", { name: "Phone" });
+  await phoneChoice.check();
+  const phone = page.getByLabel("Phone number");
+  await phone.fill("6613451154");
+  await expect(phone).toHaveValue("(661) 345-1154");
+  await phone.press("End");
+  await phone.press("Backspace");
+  await expect(phone).toHaveValue("(661) 345-115");
+  await expect(phoneChoice).toHaveCSS("accent-color", "rgb(20, 93, 73)");
+});
+
 test("required routes return useful pages", async ({ page }) => {
   for (const route of ["/how-it-works","/selling-situations","/selling-situations/inherited-property","/selling-situations/house-needs-repairs","/selling-situations/rental-property","/selling-situations/vacant-property","/selling-situations/relocating","/about","/faq","/contact","/privacy-policy","/terms","/insights","/insights/selling-a-house-as-is-bakersfield","/insights/questions-before-signing-property-purchase-agreement"]) {
     const response = await page.goto(route); expect(response.ok(), route).toBeTruthy(); await expect(page.locator("h1")).toBeVisible();
