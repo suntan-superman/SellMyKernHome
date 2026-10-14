@@ -36,20 +36,25 @@ No staging URL was created because GitHub/Netlify account access and deployment 
 ## Verification results
 
 - Site lint: pass
-- Unit/static security tests: 10/10 pass
+- Unit/static/in-memory migration tests: 15/15 pass
 - Production build: pass; all specified routes generated
 - Browser matrix: 30/30 pass
 - Axe WCAG A/AA: no serious or critical violations at six viewport widths
 - Dependency audit: zero vulnerabilities
+- Configured Supabase service connection: pass; shared `gnz_leads` table present
+- Live anonymous lead-table access: denied
+- Both configured Admin accounts: authentication and `admin_users` membership pass
+- Seller migration: confirmed not present; no database changes were made
+- Resend key: configured with two recipients; sender-domain lookup is unavailable because the key is send-only, and no live email was sent
 - Lighthouse production-like local run: Performance 96, Accessibility 100, Best Practices 100, LCP 2.8 s, CLS 0, TBT 40 ms, Speed Index 0.9 s
 - Lighthouse SEO: 69 with intentional staging noindex; 100 in a separate index-enabled audit
-- GNZ regression: lint pass, 6/6 tests pass, production build pass
+- GNZ regression: lint pass, 8/8 tests pass, production build pass
 
 ## Form submission and RLS evidence
 
-Synthetic API checks: invalid `422`, cross-origin `403`, honeypot `400`, and valid-but-unconfigured `503`. The last result confirms the application fails closed when storage is unavailable. No production/staging database was mutated and no claim of stored submission is made.
+Synthetic API checks: invalid `422`, cross-origin `403`, honeypot `400`, and valid-but-unconfigured `503`. The last result confirms the application fails closed when storage is unavailable. Read-only live verification subsequently confirmed the Supabase service connection, the existing lead table, anonymous-access denial, and both Admin memberships. The seller migration is not present. No production/staging database was mutated and no claim of stored submission is made.
 
-RLS SQL is statically verified to revoke `public`, `anon`, and `authenticated` access and grant only the server role. Live insert/read/update denial and audit/delivery verification remain blocked on approved staging Supabase credentials and migration execution.
+RLS SQL is statically verified to revoke `public`, `anon`, and `authenticated` access and grant only the server role. Live anonymous reads are denied. Insert/update denial and audit/delivery verification remain blocked on approved migration execution.
 
 ## SEO audit
 
@@ -61,7 +66,7 @@ The contracting entity, operator identity/biography/photo, transaction model, li
 
 ## Production launch checklist
 
-Complete `client-legal-approval-checklist.md`; rotate exposed GNZ credentials; create/connect the GitHub and Netlify resources; apply the migration in staging; deploy GNZ Admin compatibility changes; run live RLS, notification, assignment, audit, and existing-funnel regression tests; approve content/legal drafts; configure domain-specific Turnstile and Resend; run final accessibility/performance/security QA; explicitly authorize migration/domain/DNS; then enable indexing, GA4, and Search Console.
+Complete `client-legal-approval-checklist.md`; rotate exposed GNZ credentials; set production `NEXT_PUBLIC_SITE_URL` and `GNZ_ADMIN_BASE_URL`; configure domain-specific Turnstile and confirm the Resend sender; create/connect the GitHub and Netlify resources; apply the migration in staging; deploy GNZ Admin compatibility changes; run live RLS, notification, assignment, audit, and existing-funnel regression tests; approve content/legal drafts; run final accessibility/performance/security QA; explicitly authorize migration/domain/DNS; then enable indexing, GA4, and Search Console.
 
 ## Remaining estimate
 

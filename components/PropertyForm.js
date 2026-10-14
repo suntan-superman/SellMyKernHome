@@ -36,6 +36,12 @@ export default function PropertyForm({ compact = false, initialAddress = "" }) {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [turnstileResetSignal, setTurnstileResetSignal] = useState(0);
+
+  function resetTurnstile() {
+    setTurnstileToken("");
+    setTurnstileResetSignal((current) => current + 1);
+  }
 
   function update(event) {
     const { name, type, checked, value } = event.target;
@@ -74,6 +80,7 @@ export default function PropertyForm({ compact = false, initialAddress = "" }) {
       const result = await response.json();
       if (!response.ok) {
         setErrors(result.errors || {}); setMessage(result.message || "We could not send your inquiry. Please try again.");
+        resetTurnstile();
         if (result.errors && Object.keys(result.errors).some((key) => ["propertyAddress", "propertyCity", "propertyZip", "name", "email", "phone", "privacyAcknowledged"].includes(key))) setStep(1);
         return;
       }
@@ -81,6 +88,7 @@ export default function PropertyForm({ compact = false, initialAddress = "" }) {
       router.push(`/thank-you?reference=${encodeURIComponent(result.reference)}`);
     } catch {
       setMessage("We could not connect. Please check your connection and try again.");
+      resetTurnstile();
     } finally { setBusy(false); }
   }
 
@@ -107,9 +115,9 @@ export default function PropertyForm({ compact = false, initialAddress = "" }) {
       <div><label htmlFor="timing">Desired timing <span>Optional</span></label><select id="timing" name="timing" value={data.timing} onChange={update}><option value="">Choose one</option><option>Exploring options</option><option>Within 30 days</option><option>1–3 months</option><option>3+ months</option><option>Unsure</option></select></div>
       <div className="field-wide"><label htmlFor="comments">What would be helpful for us to know? <span>Optional</span></label><textarea id="comments" name="comments" rows="4" maxLength="2000" value={data.comments} onChange={update} /><small>Do not include bank, mortgage, access-code, or other sensitive information.</small></div>
       <label className="check-field field-wide"><input type="checkbox" name="marketingConsent" checked={data.marketingConsent} onChange={update} /><span>Optional: I agree to receive marketing calls or texts at the number I provide. Consent is not required to submit an inquiry. Message/data rates may apply. Wording requires legal approval before activation.</span></label>
-      <div className="field-wide"><TurnstileWidget onToken={setTurnstileToken} /></div>
+      <div className="field-wide"><TurnstileWidget onToken={setTurnstileToken} onStatus={setMessage} resetSignal={turnstileResetSignal} /></div>
       {message ? <div className="form-alert field-wide" role="alert">{message}</div> : null}
-      <div className="form-actions field-wide"><button className="button button-secondary" type="button" onClick={() => setStep(1)}><ArrowLeft size={18} /> Back</button><button className="button" type="submit" disabled={busy}>{busy ? <><LoaderCircle className="spin" size={18} /> Sending…</> : <>Send My Inquiry <Check size={18} /></>}</button></div>
+      <div className="form-actions field-wide"><button className="button button-secondary" type="button" onClick={() => setStep(1)}><ArrowLeft size={18} /> Back</button><button className="button" type="submit" disabled={busy || !turnstileToken}>{busy ? <><LoaderCircle className="spin" size={18} /> Sending…</> : <>Send My Inquiry <Check size={18} /></>}</button></div>
     </div>}
     {step === 1 && message ? <div className="form-alert" role="alert">{message}</div> : null}
     <p className="form-fineprint">Submitting an inquiry does not create an agency, brokerage, purchase, or other contractual relationship.</p>

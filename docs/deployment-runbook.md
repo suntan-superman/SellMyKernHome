@@ -10,7 +10,7 @@
 
 ## Staging database sequence
 
-1. Back up the target schema and record the restore point.
+1. Complete the backup and read-only preflight in migration-safety-and-rollback.md; record and verify the restore point.
 2. Confirm `gnz_leads` and its named constraints match `docs/integration-audit.md`.
 3. Review and run the additive migration in staging only.
 4. Deploy compatible GNZ Admin code; verify All/Seller/Investor filters and existing investor/contact records.
@@ -24,5 +24,5 @@ After authorization: back up; migrate; deploy GNZ Admin; deploy this site; run s
 
 ## Rollback
 
-Prefer rolling back application deployments first. The database migration is additive and should normally remain in place while code is rolled back. The supplied SQL rollback drops seller data and shared columns; it is a last resort requiring a verified backup, impact review, and explicit approval.
+Prefer the non-destructive application procedure in migration-safety-and-rollback.md. The database migration is additive and should normally remain in place while code is rolled back. The supplied SQL rollback is guarded, drops seller data and shared columns, and is a last resort requiring a verified backup, impact review, and explicit approval.
 

@@ -8,11 +8,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint app components content lib tests/*.test.js eslint.config.mjs next.config.js playwright.config.js",
-    "test": "node --test tests/validation.test.js tests/content.test.js",
+    "lint": "eslint app components content lib scripts tests eslint.config.mjs next.config.js playwright.config.js playwright.turnstile.config.js",
+    "test": "node --test tests/validation.test.js tests/content.test.js tests/migration.test.js",
     "test:e2e": "playwright test",
+    "test:turnstile": "node scripts/test-turnstile.mjs",
     "test:e2e:update": "playwright test --update-snapshots",
-    "check": "npm run lint && npm test && npm run build"
+    "check": "npm run lint && npm test && npm run build",
+    "verify:integration": "node scripts/verify-integration.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.95.3",
@@ -20,14 +22,15 @@
     "next": "^16.2.6",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "resend": "^6.28.1"
+    "resend": "^6.28.1",
+    "ws": "^8.21.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@playwright/test": "^1.56.1",
+    "@electric-sql/pglite": "^0.5.10",
     "@eslint/js": "^9.39.5",
+    "@playwright/test": "^1.56.1",
     "eslint": "^9.39.5",
     "globals": "^17.13.0"
   }
 }
-
