@@ -1,0 +1,12 @@
+.next/
+node_modules/
+.env
+.env.local
+.env.*.local
+out/
+coverage/
+test-results/
+playwright-report/
+.netlify/
+*.log
+

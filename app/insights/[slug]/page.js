@@ -1,0 +1,10 @@
+import { notFound } from "next/navigation";
+import PageHero from "@/components/PageHero";
+import CTA from "@/components/CTA";
+import { articles, getArticle } from "@/content/articles";
+
+export function generateStaticParams() { return articles.map(({ slug }) => ({ slug })); }
+export async function generateMetadata({ params }) { const article = getArticle((await params).slug); if (!article) return {}; return { title: article.title, description: article.description, alternates: { canonical: `/insights/${article.slug}` }, openGraph: { type: "article", publishedTime: article.published } }; }
+
+export default async function ArticlePage({ params }) { const article = getArticle((await params).slug); if (!article) notFound(); const schema = { "@context":"https://schema.org", "@type":"Article", headline:article.title, description:article.description, datePublished:article.published, dateModified:article.published, author:{ "@type":"Organization", name:"Sell My Kern Home editorial team" }, publisher:{ "@type":"Organization", name:"Sell My Kern Home" } }; return <main id="main-content"><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema).replaceAll("<", "\\u003c") }} /><PageHero eyebrow="PROPERTY INSIGHTS" title={article.title} intro={article.description} breadcrumbs={[{ href: "/insights", label: "Insights" }, { label: article.title }]} /><article className="prose-section"><div className="prose-narrow"><div className="notice"><strong>Attorney-review draft.</strong> This educational article is general information only and must receive California legal review before public launch.</div>{article.sections.map(([heading, paragraphs]) => <section key={heading}><h2>{heading}</h2>{paragraphs.length > 2 && paragraphs.every((line) => line.endsWith("?") || line.length < 100) ? <ul>{paragraphs.map((line) => <li key={line}>{line}</li>)}</ul> : paragraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}</section>)}</div></article><CTA title="Want to discuss the property facts?" /></main>; }
+
