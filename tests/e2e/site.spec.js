@@ -38,12 +38,23 @@ test("phone contact formats as a US number and uses the brand radio accent", asy
 });
 
 test("required routes return useful pages", async ({ page }) => {
-  for (const route of ["/how-it-works","/selling-situations","/selling-situations/inherited-property","/selling-situations/house-needs-repairs","/selling-situations/rental-property","/selling-situations/vacant-property","/selling-situations/relocating","/about","/faq","/contact","/privacy-policy","/terms","/insights","/insights/selling-a-house-as-is-bakersfield","/insights/questions-before-signing-property-purchase-agreement"]) {
+  for (const route of ["/how-it-works","/selling-situations","/sell-your-house-bakersfield","/sell-house-as-is-bakersfield","/sell-inherited-house-bakersfield","/sell-house-needs-repairs-bakersfield","/sell-rental-property-bakersfield","/selling-situations/vacant-property","/selling-situations/relocating","/about","/faq","/contact","/privacy-policy","/terms","/insights","/insights/selling-a-house-as-is-bakersfield","/insights/selling-inherited-property-kern-county","/insights/options-when-house-needs-major-repairs","/insights/questions-before-signing-property-purchase-agreement"]) {
     const response = await page.goto(route); expect(response.ok(), route).toBeTruthy(); await expect(page.locator("h1")).toBeVisible();
   }
 });
 
-test("staging robots rules block indexing", async ({ request }) => { const response = await request.get("/robots.txt"); expect(response.ok()).toBeTruthy(); expect(await response.text()).toContain("Disallow: /"); });
+test("indexing gate renders noindex while allowing crawlers to discover it", async ({ page, request }) => {
+  await page.goto("/");
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://sellmykernhome.com");
+  const robotsResponse = await request.get("/robots.txt");
+  expect(robotsResponse.ok()).toBeTruthy();
+  const robots = await robotsResponse.text();
+  expect(robots).toContain("Allow: /");
+  expect(robots).not.toContain("Disallow: /\n");
+  const sitemap = await (await request.get("/sitemap.xml")).text();
+  expect(sitemap).not.toContain("/insights/");
+});
 
 test("homepage has no serious or critical accessibility violations", async ({ page }) => {
   await page.goto("/");

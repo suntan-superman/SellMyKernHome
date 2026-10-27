@@ -2,8 +2,9 @@ import { CheckCircle2 } from "lucide-react";
 import PageHero from "@/components/PageHero";
 import Process from "@/components/Process";
 import CTA from "@/components/CTA";
+import { buildPageMetadata } from "@/lib/site";
 
-export const metadata = { title: "How It Works", description: "See how a private Kern County property inquiry moves from a few basic details to a conversation about possible next steps.", alternates: { canonical: "/how-it-works" } };
+export const metadata = buildPageMetadata({ title: "How It Works", description: "See how a private Kern County property inquiry moves from a few basic details to a conversation about possible next steps.", path: "/how-it-works" });
 
 export default function HowItWorksPage() { return <main id="main-content">
   <PageHero eyebrow="A CLEAR BEGINNING" title="A simple way to start a property conversation" intro="You do not need to prepare a sales pitch or decide on a transaction path before reaching out. Begin with the facts you know." breadcrumbs={[{ label: "How It Works" }]} />

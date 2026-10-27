@@ -19,6 +19,19 @@ const nextConfig = {
   async headers() {
     return [{ source: "/(.*)", headers: securityHeaders }];
   },
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "sellmykernhome.netlify.app" }],
+        destination: "https://sellmykernhome.com/:path*",
+        permanent: true,
+      },
+      { source: "/selling-situations/inherited-property", destination: "/sell-inherited-house-bakersfield", permanent: true },
+      { source: "/selling-situations/house-needs-repairs", destination: "/sell-house-needs-repairs-bakersfield", permanent: true },
+      { source: "/selling-situations/rental-property", destination: "/sell-rental-property-bakersfield", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

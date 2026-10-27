@@ -748,6 +748,60 @@ summary:focus-visible {
 .article-card:hover {
   box-shadow: var(--shadow);
 }
+.seller-page-lead {
+  color: var(--ink);
+  font-size: 1.18rem;
+}
+.consideration-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--line);
+}
+.consideration-grid article {
+  min-height: 210px;
+  background: var(--white);
+  padding: 32px;
+}
+.consideration-grid h3 {
+  font-size: 1.8rem;
+}
+.consideration-grid p {
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+.related-links,
+.source-links {
+  padding-left: 0;
+  list-style: none;
+}
+.related-links li,
+.source-links li {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.related-links a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--forest);
+  font-weight: 700;
+  text-decoration: none;
+}
+.source-links a {
+  color: var(--forest);
+  font-weight: 700;
+}
+.article-disclaimer {
+  border-left: 4px solid var(--brass);
+  background: var(--sage-light);
+  padding: 16px 20px;
+  font-size: 0.86rem;
+}
 .site-footer {
   background: var(--ink);
   color: #cbd8d0;
@@ -915,6 +969,9 @@ summary:focus-visible {
     grid-column: 2;
   }
   .article-grid {
+    grid-template-columns: 1fr;
+  }
+  .consideration-grid {
     grid-template-columns: 1fr;
   }
 }
