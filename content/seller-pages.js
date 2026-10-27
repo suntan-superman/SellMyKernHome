@@ -1,0 +1,111 @@
+export const sellerPages = {
+  "sell-your-house-bakersfield": {
+    approvedForIndexing: false,
+    title: "Sell Your House in Bakersfield: Start by Comparing Your Options",
+    metaTitle: "Sell Your House in Bakersfield | Compare Your Options",
+    description: "A practical starting point for Bakersfield homeowners comparing how to sell, what to prepare, and which questions to ask before choosing a path.",
+    eyebrow: "BAKERSFIELD HOME SELLING OPTIONS",
+    intro: "Selling a Bakersfield home can involve repairs, timing, occupancy, costs, and more than one possible path. Start with the property facts and the outcome that matters to you.",
+    lead: "There is no single route that fits every Kern County homeowner. Some owners prepare and list a property, some seek a direct transaction, and others decide to hold or rent. The useful comparison is based on written terms, realistic costs, and your priorities—not a headline promise.",
+    considerations: [
+      ["Condition and preparation", "List known repairs and decide which improvements, if any, deserve estimates before you compare paths."],
+      ["Timing and flexibility", "Identify dates that matter, but leave room for inspections, title work, financing, and other third parties."],
+      ["Net proceeds", "Compare expected proceeds after repairs, carrying costs, professional fees, credits, and transaction expenses."],
+      ["Certainty and obligations", "Review contingencies, access, possession, cancellation rights, and who is responsible for each step."],
+    ],
+    questions: ["Who is the proposed buyer or representative, and what role are they performing?", "What inspections, contingencies, or approvals remain?", "Which costs would I be expected to pay?", "May I have independent legal, tax, or real-estate advice before signing?"],
+    related: [
+      ["/sell-house-as-is-bakersfield", "Selling a Bakersfield house as-is"],
+      ["/how-it-works", "How the inquiry process works"],
+      ["/insights/questions-before-signing-property-purchase-agreement", "Questions before signing an agreement"],
+    ],
+  },
+  "sell-house-as-is-bakersfield": {
+    approvedForIndexing: false,
+    title: "Selling a House As-Is in Bakersfield",
+    metaTitle: "Sell a House As-Is in Bakersfield | What to Consider",
+    description: "Understand condition, disclosure, repair, timing, and written-term considerations before selling a Bakersfield house as-is.",
+    eyebrow: "AS-IS HOME SALE CONSIDERATIONS",
+    intro: "An as-is sale generally means the seller does not plan to complete agreed repairs before closing. It does not make every transaction identical or remove the need to understand disclosures and contract terms.",
+    lead: "Before deciding, make a factual inventory of the home and compare the costs, time, and uncertainty of the paths available to you. A conversation can begin before you have every estimate, but any proposal should be evaluated in writing.",
+    considerations: [
+      ["Known condition", "Collect reports, invoices, permits, and notes about roof, plumbing, electrical, foundation, water, and other material issues."],
+      ["Repair choices", "Separate safety or preservation work from cosmetic projects and obtain independent estimates when they would improve your comparison."],
+      ["Inspections and access", "Ask what inspections or walkthroughs are expected and whether the agreement allows later price or repair requests."],
+      ["California disclosures", "As-is wording does not by itself answer which disclosures apply. A qualified California professional can advise you about your property."],
+    ],
+    questions: ["Which repairs, if any, does the proposed agreement require?", "Can the terms change after an inspection or due-diligence period?", "What are the expected net proceeds after all costs?", "What happens if either party cannot meet the proposed date?"],
+    related: [
+      ["/sell-house-needs-repairs-bakersfield", "Options when a house needs repairs"],
+      ["/insights/selling-a-house-as-is-bakersfield", "As-is selling checklist"],
+      ["/contact", "Share your property details"],
+    ],
+  },
+  "sell-inherited-house-bakersfield": {
+    approvedForIndexing: false,
+    title: "Selling an Inherited House in Bakersfield",
+    metaTitle: "Sell an Inherited House in Bakersfield | Questions to Organize",
+    description: "Questions for Bakersfield and Kern County families to organize before deciding whether or how to sell an inherited property.",
+    eyebrow: "INHERITED PROPERTY QUESTIONS",
+    intro: "An inherited property can involve authority, title, family decisions, belongings, condition, and tax questions. Clarifying who may act is a sensible first step.",
+    lead: "The correct process depends on how the property was owned and the estate circumstances. This page offers a planning checklist, not probate, tax, or legal advice. Confirm authority and deadlines with qualified professionals before signing a sale agreement.",
+    considerations: [
+      ["Authority and ownership", "Locate the deed, trust or estate documents, and any court appointment that may determine who can act."],
+      ["People and belongings", "Identify decision-makers, occupants, personal property, and how family communications will be handled."],
+      ["Property records", "Gather insurance, loan, tax, utility, repair, permit, and maintenance records without sending sensitive documents through this site."],
+      ["Professional questions", "An estate attorney, tax professional, and appropriate real-estate adviser can address consequences specific to the estate."],
+    ],
+    questions: ["Who has verified authority to sign for the property?", "Are there co-owners, beneficiaries, occupants, liens, or unresolved title questions?", "Will belongings or repairs affect the timing?", "Which legal or tax questions need independent advice before a decision?"],
+    related: [
+      ["/insights/selling-inherited-property-kern-county", "Inherited-property questions to consider"],
+      ["/sell-house-as-is-bakersfield", "As-is sale considerations"],
+      ["/selling-situations/vacant-property", "Planning for a vacant property"],
+    ],
+  },
+  "sell-house-needs-repairs-bakersfield": {
+    approvedForIndexing: false,
+    title: "Selling a Bakersfield House That Needs Repairs",
+    metaTitle: "Sell a House That Needs Repairs in Bakersfield | Options",
+    description: "Organize repair facts, estimates, disclosures, and sale-path questions for a Bakersfield or Kern County house that needs work.",
+    eyebrow: "HOMES THAT NEED WORK",
+    intro: "A long repair list does not have to become a rushed decision. Document what you know, protect the property, and compare realistic costs and transaction terms.",
+    lead: "Roof, plumbing, electrical, water, foundation, cooling, and deferred maintenance can affect preparation, buyer interest, inspections, and price. The goal is not to guess at the perfect renovation; it is to understand the tradeoffs of repairing, listing in current condition, or considering another documented path.",
+    considerations: [
+      ["Safety and preservation", "Address urgent hazards or active damage first, and use qualified professionals for work beyond your expertise."],
+      ["Scope and evidence", "Photographs, inspection reports, permits, invoices, and independent estimates can make comparisons more concrete."],
+      ["Cost versus benefit", "Consider repair cost, project time, carrying costs, possible value change, and the risk of additional findings."],
+      ["Written transaction terms", "Understand inspection rights, repair credits, contingencies, access, and which party pays each cost."],
+    ],
+    questions: ["Which work is urgent, optional, or still uncertain?", "Would an independent inspection or estimate change the decision?", "How do the likely net proceeds compare after repair and holding costs?", "Which known conditions may need to be disclosed?"],
+    related: [
+      ["/insights/options-when-house-needs-major-repairs", "Options when major repairs are needed"],
+      ["/sell-house-as-is-bakersfield", "Selling as-is in Bakersfield"],
+      ["/how-it-works", "What happens after an inquiry"],
+    ],
+  },
+  "sell-rental-property-bakersfield": {
+    approvedForIndexing: false,
+    title: "Selling a Rental Property in Bakersfield",
+    metaTitle: "Sell a Rental Property in Bakersfield | Owner Checklist",
+    description: "A checklist for Bakersfield rental owners considering occupancy, records, condition, timing, tenant rights, and sale options.",
+    eyebrow: "BAKERSFIELD RENTAL PROPERTY",
+    intro: "A rental sale involves the property, its records, and the rights of the people who live there. Begin with accurate lease and occupancy information.",
+    lead: "Tenant-occupied and recently vacant properties can require different planning. Before marketing, access, notices, or possession discussions, review current agreements and obtain California landlord-tenant advice for your circumstances.",
+    considerations: [
+      ["Lease and occupancy", "Gather signed agreements, amendments, payment records, notices, and the current names and occupancy facts."],
+      ["Deposits and records", "Organize security-deposit documentation, maintenance requests, repairs, inspections, permits, and vendor records."],
+      ["Access and communication", "Plan lawful notice and access procedures and communicate carefully with occupants about what is actually decided."],
+      ["Financial comparison", "Consider income, expenses, repairs, vacancy risk, taxes, sale costs, and written terms with qualified advisers."],
+    ],
+    questions: ["What are the current lease term and occupancy status?", "Which notice, access, or relocation rules may apply?", "What records should transfer with the property?", "How would keeping, preparing, listing, or another sale path compare?"],
+    related: [
+      ["/selling-situations", "Other property situations"],
+      ["/sell-house-needs-repairs-bakersfield", "Planning around repair needs"],
+      ["/contact", "Start a private property inquiry"],
+    ],
+  },
+};
+
+export function getSellerPage(slug) {
+  return sellerPages[slug];
+}

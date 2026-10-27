@@ -3,11 +3,17 @@ import { createSellerLead } from "@/lib/leads";
 import { createServiceClient } from "@/lib/supabase";
 import { checkRateLimit, getRequestIp, verifyTurnstile } from "@/lib/rateLimit";
 import { passesHoneypot, validateSellerLead } from "@/lib/validation";
+import { SITE_URL } from "@/lib/site";
 
 function isAllowedOrigin(request) {
   const origin = request.headers.get("origin"); if (!origin) return true;
-  const configured = process.env.NEXT_PUBLIC_SITE_URL;
-  try { return new URL(origin).origin === new URL(configured || request.url).origin; } catch { return false; }
+  try {
+    const candidate = new URL(origin).origin;
+    const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
+    const protocol = request.headers.get("x-forwarded-proto") || new URL(request.url).protocol.replace(":", "");
+    const requestOrigin = host ? `${protocol}://${host}` : new URL(request.url).origin;
+    return candidate === requestOrigin || candidate === new URL(SITE_URL).origin;
+  } catch { return false; }
 }
 export async function POST(request) {
   if (!isAllowedOrigin(request)) return NextResponse.json({ message: "Request origin was not accepted." }, { status: 403 });

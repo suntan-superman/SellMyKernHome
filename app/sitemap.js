@@ -1,13 +1,15 @@
 import { articles } from "@/content/articles";
-import { situations } from "@/content/situations";
+import { sellerPages } from "@/content/seller-pages";
+import { SITE_URL, isIndexingEnabled } from "@/lib/site";
+
+const coreRoutes = ["", "/how-it-works", "/selling-situations", "/about", "/faq", "/contact", "/insights", "/selling-situations/vacant-property", "/selling-situations/relocating"];
 
 export default function sitemap() {
-  const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  const routes = ["", "/how-it-works", "/selling-situations", "/about", "/faq", "/contact", "/insights"];
+  if (!isIndexingEnabled()) return [];
+  const dated = (path, priority = 0.7) => ({ url: `${SITE_URL}${path}`, lastModified: "2026-10-14", changeFrequency: path === "" ? "weekly" : "monthly", priority: path === "" ? 1 : priority });
   return [
-    ...routes.map((route) => ({ url: `${base}${route}`, lastModified: "2026-10-14", changeFrequency: route === "" ? "weekly" : "monthly", priority: route === "" ? 1 : .7 })),
-    ...situations.map(({ slug }) => ({ url: `${base}/selling-situations/${slug}`, lastModified: "2026-10-14", changeFrequency: "monthly", priority: .7 })),
-    ...articles.map(({ slug, published }) => ({ url: `${base}/insights/${slug}`, lastModified: published, changeFrequency: "monthly", priority: .65 })),
+    ...coreRoutes.map((route) => dated(route)),
+    ...Object.entries(sellerPages).filter(([, page]) => page.approvedForIndexing).map(([slug]) => dated(`/${slug}`, 0.8)),
+    ...articles.filter((article) => article.approvedForIndexing).map((article) => ({ url: `${SITE_URL}/insights/${article.slug}`, lastModified: article.updated, changeFrequency: "monthly", priority: 0.65 })),
   ];
 }
-

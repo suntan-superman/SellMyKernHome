@@ -7,10 +7,27 @@ const root = path.resolve(import.meta.dirname, "..");
 const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 
 test("all required public routes exist", () => {
-  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/terms/page.js","app/thank-you/page.js"];
+  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/terms/page.js","app/thank-you/page.js"];
   for (const route of routes) assert.equal(fs.existsSync(path.join(root, route)), true, route);
 });
-test("staging is noindexed by default", () => { const robots = read("app/robots.js"); assert.match(robots, /NEXT_PUBLIC_ROBOTS_INDEX/); assert.match(robots, /disallow: "\/"/); });
+test("disabled indexing uses rendered noindex without blocking public crawling", () => {
+  const layout = read("app/layout.js");
+  const robots = read("app/robots.js");
+  assert.match(layout, /robots: indexable \? \{ index: true, follow: true \} : \{ index: false, follow: true \}/);
+  assert.match(robots, /allow: "\/"/);
+  assert.doesNotMatch(robots, /disallow: "\/"/);
+});
+test("canonical origin and sitemap are permanently domain-scoped", () => {
+  assert.match(read("lib/site.js"), /https:\/\/sellmykernhome\.com/);
+  assert.match(read("app/sitemap.js"), /if \(!isIndexingEnabled\(\)\) return \[\]/);
+  assert.match(read("next.config.js"), /sellmykernhome\.netlify\.app/);
+});
+test("draft educational content cannot enter the sitemap", () => {
+  const articles = read("content/articles.js");
+  const sitemap = read("app/sitemap.js");
+  assert.match(articles, /approvedForIndexing: false/g);
+  assert.match(sitemap, /filter\(\(article\) => article\.approvedForIndexing\)/);
+});
 test("migration reasserts deny-by-default lead security", () => {
   const sql = read("supabase/migrations/20261014_sellmykernhome_leads.sql");
   assert.match(sql, /alter table public\.gnz_leads enable row level security/i);
@@ -47,8 +64,17 @@ test("rollback is manually gated and documented as destructive", () => {
 });
 test("notification body intentionally excludes seller PII fields", () => { const source = read("lib/notifications.js"); assert.doesNotMatch(source, /lead\.(email|phone|property_address|propertyAddress|first_name|last_name)/); });
 test("analytics filters common PII parameter names", () => assert.match(read("lib/analytics.js"), /name\|email\|phone\|address\|notes\|comment/));
+test("seller funnel uses the approved non-PII event taxonomy", () => {
+  const form = read("components/PropertyForm.js");
+  const analytics = read("components/Analytics.js");
+  for (const event of ["seller_form_start", "seller_form_submit_success", "seller_form_validation_error"]) assert.match(form, new RegExp(event));
+  for (const event of ["primary_cta_click", "phone_click", "email_click"]) assert.match(`${analytics}\n${read("components/CTA.js")}`, new RegExp(event));
+  assert.doesNotMatch(form, /seller_lead_submitted|track\("form_start"/);
+});
 test("seller endpoint validates before server-side lead creation", () => {
   const route = read("app/api/leads/route.js");
+  assert.match(route, /candidate === requestOrigin/);
+  assert.match(route, /candidate === new URL\(SITE_URL\)\.origin/);
   assert.match(route, /validateSellerLead\(input\)/);
   assert.match(route, /passesHoneypot\(validation\.data\)/);
   assert.match(route, /verifyTurnstile\(input\.turnstileToken, ip\)/);

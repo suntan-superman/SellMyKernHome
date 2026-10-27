@@ -1,14 +1,12 @@
 # Image credits
 
-## Bakersfield home
+## Homepage hero
 
-- File: `public/images/bakersfield-home.jpg`
-- Work: “2009-0726-CA-Bakersfield-BushHouse.jpg”
-- Creator: Bobak Ha'Eri
-- Location/subject: The Bush House in Bakersfield, California
-- Source: https://commons.wikimedia.org/wiki/File:2009-0726-CA-Bakersfield-BushHouse.jpg
-- License: Creative Commons Attribution-ShareAlike 3.0 Unported
-- Changes: resized by Wikimedia's thumbnail service; displayed with responsive cropping by the website.
+- File: `public/images/modern-home-exterior.jpg`
+- Source: [Concept of Modern House](https://www.pexels.com/photo/concept-of-modern-house-9976121/)
+- Photographer: Jonathan Borba
+- License: [Pexels license](https://www.pexels.com/license/)
+- Downloaded: October 27, 2026
+- Usage: Homepage hero and default social-sharing image
 
-Retain this attribution in the repository and add a user-facing photo-credit treatment if counsel or the final design review requires it.
-
+The photograph is used as a representative home exterior. It is not presented as a specific Bakersfield property; the visible caption describes the website's service area.

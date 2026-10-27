@@ -3,9 +3,10 @@ import { CheckCircle2 } from "lucide-react";
 import PageHero from "@/components/PageHero";
 import CTA from "@/components/CTA";
 import { getSituation, situations } from "@/content/situations";
+import { buildPageMetadata } from "@/lib/site";
 
 export function generateStaticParams() { return situations.map(({ slug }) => ({ slug })); }
-export async function generateMetadata({ params }) { const item = getSituation((await params).slug); if (!item) return {}; return { title: `${item.title} in Kern County`, description: item.intro, alternates: { canonical: `/selling-situations/${item.slug}` } }; }
+export async function generateMetadata({ params }) { const item = getSituation((await params).slug); if (!item) return {}; return buildPageMetadata({ title: `${item.title} in Kern County`, description: item.intro, path: item.href }); }
 
 export default async function SituationPage({ params }) {
   const item = getSituation((await params).slug); if (!item) notFound();

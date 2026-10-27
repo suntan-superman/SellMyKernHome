@@ -92,6 +92,9 @@ test("rate limiting remains active before lead creation", async ({ request }) =>
 
 test("widget renders and a successful form creates the correctly attributed lead", async ({ page, request }) => {
   test.skip(testMode !== "pass", "Pass-mode verification.");
+  const analyticsEvents = [];
+  await page.exposeFunction("captureAnalyticsEvent", (...args) => analyticsEvents.push(args));
+  await page.addInitScript(() => { window.gtag = (...args) => window.captureAnalyticsEvent(...args); });
   await page.goto("/?utm_source=turnstile-test&utm_medium=playwright");
   await page.getByLabel("Property street address").fill("123 Isolated Test Street");
   await page.getByLabel("City").fill("Bakersfield");
@@ -114,8 +117,10 @@ test("widget renders and a successful form creates the correctly attributed lead
   const submitButton = page.getByRole("button", { name: "Send My Inquiry" });
   await expect(submitButton).toBeEnabled({ timeout: 15000 });
   await submitButton.click();
-  await expect(page).toHaveURL(/\/thank-you\?reference=SMKH-/i, { timeout: 15000 });
+  await expect(page).toHaveURL(/\/thank-you$/i, { timeout: 15000 });
   await expect(page.getByRole("heading", { name: /Thank you/ })).toBeVisible();
+  expect(analyticsEvents.some((event) => event[0] === "event" && event[1] === "seller_form_start")).toBe(true);
+  expect(analyticsEvents.filter((event) => event[0] === "event" && event[1] === "seller_form_submit_success")).toHaveLength(1);
 
   const result = await state(request);
   expect(result.leads).toHaveLength(1);

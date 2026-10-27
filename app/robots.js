@@ -1,6 +1,10 @@
+import { SITE_URL, isIndexingEnabled } from "@/lib/site";
+
 export default function robots() {
-  const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  const indexable = process.env.NEXT_PUBLIC_ROBOTS_INDEX === "true";
-  return { rules: indexable ? { userAgent: "*", allow: "/", disallow: ["/api/", "/thank-you"] } : { userAgent: "*", disallow: "/" }, sitemap: indexable ? `${base}/sitemap.xml` : undefined };
+  const indexable = isIndexingEnabled();
+  return {
+    rules: { userAgent: "*", allow: "/", disallow: ["/api/", "/thank-you"] },
+    sitemap: indexable ? `${SITE_URL}/sitemap.xml` : undefined,
+  };
 }
 
