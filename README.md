@@ -24,11 +24,11 @@ npm run test:e2e
 
 ## Data integration
 
-Read `docs/integration-audit.md` first. The proposed additive migration is `supabase/migrations/20261014_sellmykernhome_leads.sql`; it has not been applied. The rollback script is intentionally destructive and must never be run without a verified backup and explicit approval.
+The production target is the existing PropertyIntelligence Supabase project. The additive, PI-only migration `supabase/migrations/20261101_smkh_property_intelligence.sql` was applied and certified on 2026-11-01 with SHA-256 `C290C893CD70207CE2CB157C677AA10DE4E06A45B0F7F067E39E3303EA30917C`. It created an empty independent SMKH workflow and did not import records from another project. Follow `docs/SMKH_DIRECT_PRODUCTION_RUNBOOK.md`; do not rerun the migration or execute a destructive rollback.
 
 All Supabase writes occur server-side. Browser-safe variables use the `NEXT_PUBLIC_` prefix; the service credential never does. Seller notifications contain a reference and secure Admin link, not full lead details.
 
 ## Deployment gate
 
-Deploy only to a Netlify preview or branch URL with `NEXT_PUBLIC_ROBOTS_INDEX=false`. Do not attach the custom domain, change DNS, enable indexing/analytics, run the production migration, or publish the legal drafts until the approval checklist is complete.
+Deploy only after the PI migration, postflight, and Netlify environment cutover receive explicit owner approval. Keep `NEXT_PUBLIC_ROBOTS_INDEX=false` and `SMKH_NOTIFICATIONS_ENABLED=false`; do not change DNS, enable indexing/analytics, or publish legal drafts until their separate approval gates are complete.
 

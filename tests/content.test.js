@@ -47,14 +47,15 @@ test("security-definer functions use restricted paths and explicit grants", () =
   assert.match(sql, /grant execute on function public\.smkh_check_rate_limit[\s\S]*?to service_role/i);
   assert.match(sql, /grant execute on function public\.smkh_admin_update_lead[\s\S]*?to service_role/i);
 });
-test("independent workflow isolates SMKH records and least-privilege administration", () => {
-  const sql = read("supabase/migrations/20261101_smkh_independent_workflow.sql");
-  assert.match(sql, /create table if not exists public\.smkh_leads/i);
-  assert.match(sql, /create table if not exists public\.smkh_admin_memberships/i);
-  assert.match(sql, /where g\.lead_type = 'seller' or g\.source_site = 'sellmykernhome\.com'/i);
+test("PI workflow is empty, additive, and least-privilege", () => {
+  const sql = read("supabase/migrations/20261101_smkh_property_intelligence.sql");
+  assert.match(sql, /create table public\.smkh_leads/i);
+  assert.match(sql, /create table public\.smkh_admin_memberships/i);
+  assert.doesNotMatch(sql, /gnz|cutpro|legacy_gnz|from public\.admin_users/i);
   assert.match(sql, /alter table public\.smkh_leads enable row level security/i);
   assert.match(sql, /grant select, insert on public\.smkh_leads to service_role/i);
-  assert.doesNotMatch(sql, /delete from public\.gnz_leads|update public\.gnz_leads/i);
+  assert.match(sql, /grant execute on function public\.smkh_check_rate_limit[\s\S]*?to service_role/i);
+  assert.doesNotMatch(sql, /insert into public\.smkh_leads[\s\S]*?select/i);
 });
 test("admin RPC verifies membership and uses transaction-local actor context", () => {
   const sql = read("supabase/migrations/20261014_sellmykernhome_leads.sql");

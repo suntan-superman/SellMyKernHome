@@ -6,7 +6,7 @@ The owner canceled the former preview/staging plan on 2026-11-01. Do not create 
 
 Do not deploy until the owner approves the reviewed release commit and migration checksum. Before any database write, verify the existing Supabase project identity, create and restore-test a recoverable backup, record live schema/count/permission baselines, and pass the read-only preflight. Stop on drift.
 
-Apply the independent SMKH migration exactly once only after authorization, using the verified owner context and commands in the authoritative runbook. No GNZ Admin membership is copied; exactly one verified existing Supabase Auth user is bootstrapped as the independent SMKH owner. Run postflight before deploying application code. Existing GNZ records and authentication users must remain unchanged.
+Apply the PropertyIntelligence-targeted SMKH migration exactly once only after authorization, using the verified PI owner context and commands in the authoritative runbook. The release never connects to CutPro and copies no historical records. Exactly one verified existing PI Supabase Auth user is bootstrapped as the independent SMKH owner. Run postflight before deploying application code. Existing PI records, permissions, and authentication users must remain unchanged.
 
 ## Application release
 
@@ -14,4 +14,4 @@ Deploy the owner-approved Git commit through the existing GitHub-connected Netli
 
 ## Recovery
 
-Prefer restoring the previously deployed application commit while retaining the independent SMKH records. Disable intake and notifications if required. Do not automatically drop database objects or delete copied/new lead records.
+Prefer restoring the previously deployed application commit while retaining the independent SMKH records. Disable intake and notifications if required. Do not automatically drop database objects or delete new lead records.

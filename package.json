@@ -10,7 +10,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint app components content lib scripts tests proxy.js eslint.config.mjs next.config.js playwright.config.js playwright.turnstile.config.js",
-    "test": "node --test tests/validation.test.js tests/content.test.js tests/migration.test.js tests/independent-migration.test.js tests/admin-data.test.js",
+    "test": "node --test tests/validation.test.js tests/content.test.js tests/migration.test.js tests/pi-migration.test.js tests/admin-data.test.js",
     "test:e2e": "playwright test",
     "test:turnstile": "node scripts/test-turnstile.mjs",
     "test:e2e:update": "playwright test --update-snapshots",

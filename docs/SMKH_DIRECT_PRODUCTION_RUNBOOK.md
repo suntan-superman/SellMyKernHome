@@ -1,90 +1,108 @@
-# Sell My Kern Home direct-production release runbook
+# Sell My Kern Home — PropertyIntelligence production runbook
 
-Status: implementation prepared; database migration and application deployment are **not authorized by this document**.
+Status: PI database migration applied and postflight verified on 2026-11-01. Application deployment remains pending and is not authorized by this document.
 
-Reviewed migration SHA-256: `A4FAA6782406236B0F1DF30BF625A58B72F61A9C3F6422AC0464A80FCC35C828`. Any change to the migration invalidates this value and requires another review and authorization.
+Applied migration SHA-256: `C290C893CD70207CE2CB157C677AA10DE4E06A45B0F7F067E39E3303EA30917C`. Do not rerun the migration.
 
-## Scope and verified baseline
+## Fixed scope
 
-The release creates an independent SMKH workflow inside the existing Supabase project. It does not update or delete `gnz_leads`, `admin_users`, legacy audit records, legacy notification records, or Supabase Auth users. The one-time copy selects only records whose `lead_type = 'seller'` or `source_site = 'sellmykernhome.com'`.
+- Permanent database project: PropertyIntelligence (`jsrvdryddojhkmjzotef`).
+- Session Pooler: `aws-0-us-west-2.pooler.supabase.com:5432`, database `postgres`, username `postgres.jsrvdryddojhkmjzotef`.
+- Migration: `supabase/migrations/20261101_smkh_property_intelligence.sql`.
+- The migration is additive and creates an empty SMKH workflow. It does not connect to another project, import historical records, create Auth users, or alter existing PI objects or permissions.
+- Exactly one existing, active, confirmed PI Auth user is bootstrapped as owner after its UUID/email pair is verified read-only.
+- No staging infrastructure is used.
 
-GNZ Admin memberships are not copied. The migration requires an explicitly supplied, independently verified Supabase Auth UUID and matching Auth email. It creates exactly one active SMKH membership with role `owner`. The UUID is never stored in source control or guessed from an email address. Historical seller assignment UUIDs and audit actors remain preserved as historical values without granting those users SMKH access.
+## Objects introduced
 
-The read-only inspection on 2026-11-01 found three `gnz_leads` records: two SMKH seller records and one unrelated investor record; two `admin_users` memberships; four legacy seller audit events; one legacy notification record; and one rate-limit bucket. These counts are observations, not assumptions. They must be rechecked immediately before execution.
+Tables: `smkh_admin_memberships`, `smkh_leads`, `smkh_lead_events`, `smkh_notifications`, and `smkh_rate_limits`.
 
-## Required backup gate
+Functions: `smkh_audit_independent_lead()`, `smkh_update_lead(uuid,text,text,timestamptz,timestamptz)`, and `smkh_check_rate_limit(text,integer,integer)`.
 
-Before migration, obtain a fresh direct PostgreSQL connection string from the verified Supabase project. Do not put it in shell history or the repository. Use a temporary environment variable and an encrypted, access-controlled backup directory outside the repository.
+The migration also adds four lead indexes, one audit index, one notification index, four read policies, and one audit trigger. It fails closed if any intended table, index, or function already exists.
 
-Create both a custom-format database backup and a schema-only backup. At minimum, the custom backup must include `auth.users`, `public.admin_users`, `public.gnz_leads`, `public.smkh_lead_audit`, `public.smkh_notification_logs`, and `public.smkh_rate_limits`; a complete project database backup is preferred.
+## Mandatory backup and identity gate
+
+1. Download the PI Server root certificate from Supabase Database Settings.
+2. Connect through the verified Session Pooler with `sslmode=verify-full`; never downgrade to `require` for release operations.
+3. Enter the database password through `Read-Host -AsSecureString` or the local masked operator prompt. Never put it in a URI, command history, repository file, or log.
+4. Verify the connection uses TLS, database `postgres`, the project-qualified pooler username, and the expected PI schema fingerprint.
+5. Create checksummed custom-format and schema-only backups of PI, restore-test the custom backup into an empty local PostgreSQL database, and reconcile all PI table counts. Stop on any restore error or drift.
+6. Record a fresh schema-only dump and catalog snapshot of every existing PI table, grant, RLS policy, function, and trigger. Postflight must show that only the reviewed `smkh_*` objects were added.
+
+## Owner verification and read-only preflight
+
+Locate the intended owner by email in PI `auth.users`; copy the returned UUID rather than generating or reusing a UUID from another project. Confirm that the record is active, confirmed, not deleted, and not banned.
+
+In one protected PowerShell session, set temporary process values without echoing them:
 
 ```powershell
-$secureDb = Read-Host 'Direct PostgreSQL connection' -AsSecureString
-$env:SMKH_RELEASE_DB_URL = [System.Net.NetworkCredential]::new('', $secureDb).Password
-pg_dump --format=custom --no-owner --no-acl --file <secure-path> "$env:SMKH_RELEASE_DB_URL"
-pg_dump --schema-only --no-owner --no-acl --file <secure-schema-path> "$env:SMKH_RELEASE_DB_URL"
-Get-FileHash -Algorithm SHA256 <secure-path>
-Get-FileHash -Algorithm SHA256 <secure-schema-path>
+$env:SMKH_RELEASE_OWNER_USER_ID = Read-Host 'Verified PI Auth UUID'
+$env:SMKH_RELEASE_OWNER_EMAIL = Read-Host 'Matching PI Auth email'
+$env:SMKH_RELEASE_OWNER_DISPLAY_NAME = Read-Host 'Approved owner display name'
 ```
 
-Restore the custom backup into a disposable, isolated PostgreSQL database and run table counts plus representative schema/constraint checks. The restore test must succeed before production execution. Destroying that disposable restore requires separate confirmation and must never target production.
+Run the PI-only read-only wrapper with the verified TLS connection:
 
 ```powershell
-$secureRestore = Read-Host 'Empty isolated restore database connection' -AsSecureString
-$env:SMKH_RESTORE_DB_URL = [System.Net.NetworkCredential]::new('', $secureRestore).Password
-pg_restore --exit-on-error --no-owner --no-acl --dbname "$env:SMKH_RESTORE_DB_URL" <secure-path>
-psql "$env:SMKH_RESTORE_DB_URL" --command="select (select count(*) from public.gnz_leads) as gnz_leads, (select count(*) from public.admin_users) as admin_users, (select count(*) from public.smkh_lead_audit) as audit_events, (select count(*) from public.smkh_notification_logs) as notification_logs;"
-Remove-Item Env:SMKH_RESTORE_DB_URL
-Remove-Variable secureRestore -ErrorAction SilentlyContinue
+psql "$env:SMKH_PI_DB_CONNECTION" `
+  --set=owner_user_id="$env:SMKH_RELEASE_OWNER_USER_ID" `
+  --set=owner_email="$env:SMKH_RELEASE_OWNER_EMAIL" `
+  --set=owner_display_name="$env:SMKH_RELEASE_OWNER_DISPLAY_NAME" `
+  --file=supabase/verification/20261101_smkh_pi_preflight.psql
 ```
 
-## Execution gates
+Preflight must show a verified Auth match and zero SMKH collisions. Review and authorize the exact migration SHA-256 after the live preflight; any file change invalidates that approval.
 
-1. Verify the Supabase project reference and database host against the approved production record.
-2. Record `Get-FileHash -Algorithm SHA256 supabase/migrations/20261101_smkh_independent_workflow.sql` and compare it with the release approval.
-3. Record and verify both backup checksums and the isolated restore-test result.
-4. In Supabase Auth, locate the owner's existing user by the independently verified owner email. Copy the UUID from the Auth record and verify the UUID/email pair a second time. Do not infer or generate a UUID, and do not modify the Auth user.
-5. In the same protected PowerShell session, retain the direct connection variable used for backup and put the verified owner values into temporary process environment variables. If the backup was performed in another session, repeat the secure `Read-Host` connection steps above. Do not commit, echo, log, or place literal values in command history:
+## Executed database sequence
 
-   ```powershell
-   $env:SMKH_RELEASE_OWNER_USER_ID = Read-Host 'Verified existing Auth UUID'
-   $env:SMKH_RELEASE_OWNER_EMAIL = Read-Host 'Matching verified Auth email'
-   $env:SMKH_RELEASE_OWNER_DISPLAY_NAME = Read-Host 'Approved owner display name'
-   ```
+The following sequence was completed once on 2026-11-01 and must not be repeated:
 
-6. Run the read-only preflight in one direct `psql` session. The context script validates presence; the preflight validates that UUID and email match one existing Auth record. Stop on any exception, false owner match, count drift, schema drift, permission drift, missing required seller value, or pre-existing independent object:
+```powershell
+psql "$env:SMKH_PI_DB_CONNECTION" `
+  --set=owner_user_id="$env:SMKH_RELEASE_OWNER_USER_ID" `
+  --set=owner_email="$env:SMKH_RELEASE_OWNER_EMAIL" `
+  --set=owner_display_name="$env:SMKH_RELEASE_OWNER_DISPLAY_NAME" `
+  --file=supabase/verification/20261101_smkh_pi_apply_and_postflight.psql
+```
 
-   ```powershell
-   psql "$env:SMKH_RELEASE_DB_URL" --set=owner_user_id="$env:SMKH_RELEASE_OWNER_USER_ID" --set=owner_email="$env:SMKH_RELEASE_OWNER_EMAIL" --set=owner_display_name="$env:SMKH_RELEASE_OWNER_DISPLAY_NAME" --file=supabase/verification/20261101_smkh_preflight.psql
-   ```
+The postflight must report one owner membership and zero leads, events, notifications, and rate-limit rows. It must also verify RLS, grants, restricted RPC execution, function search paths, and service-role limitations. Compare the PI catalog snapshot and counts against the backup baseline before changing Netlify.
 
-7. Review and archive the preflight output. Reconfirm that it reports two source SMKH seller records and that all recorded GNZ counts match the backup/restore baseline. Obtain explicit authorization for the recorded migration checksum.
-8. Apply the exact migration once and immediately run postflight in the same direct session:
+## Netlify environment cutover
 
-   ```powershell
-   psql "$env:SMKH_RELEASE_DB_URL" --set=owner_user_id="$env:SMKH_RELEASE_OWNER_USER_ID" --set=owner_email="$env:SMKH_RELEASE_OWNER_EMAIL" --set=owner_display_name="$env:SMKH_RELEASE_OWNER_DISPLAY_NAME" --file=supabase/verification/20261101_smkh_apply_and_postflight.psql
-   ```
+Change these values together only after database postflight passes:
 
-9. Postflight must report exactly one active owner membership matching the verified UUID; two independent seller records; zero missing source sellers; unchanged GNZ totals; RLS enabled; anonymous SELECT/RPC false; and service-role UPDATE, DELETE, and Admin RPC false. Stop without destructive rollback if any check fails.
-10. Clear the temporary owner and connection environment variables from the session:
+- `NEXT_PUBLIC_SUPABASE_URL` → `https://jsrvdryddojhkmjzotef.supabase.co`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` → PI publishable key
+- `SUPABASE_SECRET_KEY` → PI server-only secret key
 
-   ```powershell
-   Remove-Item Env:SMKH_RELEASE_DB_URL,Env:SMKH_RELEASE_OWNER_USER_ID,Env:SMKH_RELEASE_OWNER_EMAIL,Env:SMKH_RELEASE_OWNER_DISPLAY_NAME
-   Remove-Variable secureDb -ErrorAction SilentlyContinue
-   ```
-11. Sign in as the verified owner and confirm the two leads and historical audit events through RLS. Verify an authenticated non-member sees zero rows and cannot call the mutation RPC.
-12. Only then deploy the reviewed application commit. Keep `NEXT_PUBLIC_ROBOTS_INDEX=false` and `SMKH_NOTIFICATIONS_ENABLED=false` until the separate content, sender-domain, recipient, and indexing gates pass.
+Review or remove obsolete values:
+
+- Remove any database password from Netlify; the application does not use it.
+- Remove `GNZ_ADMIN_BASE_URL` if present.
+- Set `SMKH_ADMIN_BASE_URL` to the approved SellMyKernHome production origin.
+
+Keep these controls unchanged unless separately approved:
+
+- `NEXT_PUBLIC_TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`: site integration remains tied to the public domain, not Supabase.
+- `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_REPLY_TO`, and `LEAD_NOTIFICATION_EMAIL`: review recipients/sender separately; keep `SMKH_NOTIFICATIONS_ENABLED=false` during cutover.
+- `RATE_LIMIT_HMAC_SECRET`: retain the current strong value; PI starts with an empty database rate-limit table.
+- `NEXT_PUBLIC_ROBOTS_INDEX=false`: remain disabled through release verification.
+
+The public Supabase URL and publishable key are build-time Next.js values, so the Netlify environment update requires a new build. The secret key is server-only and must never use a `NEXT_PUBLIC_` name. Existing browser Admin cookies belong to the previous Auth project and must be replaced by a fresh PI sign-in.
+
+## Verification before enabling intake
+
+1. Sign in as the verified PI owner and confirm the Admin lead list is empty.
+2. Confirm an authenticated PI non-member sees no SMKH rows and cannot call `smkh_update_lead`.
+3. Confirm anonymous users cannot read any SMKH table or execute either RPC.
+4. Confirm the secret-key server client can insert/select leads and insert notifications, but cannot directly update/delete leads or mutate memberships/audit records.
+5. Keep notifications, indexing, and public intake disabled until a separately authorized synthetic end-to-end test.
 
 ## Non-destructive recovery
 
-The preferred rollback is application-only: restore the previously deployed application commit and leave all new SMKH tables and copied history in place. Disable lead intake at the hosting layer if needed. Set `SMKH_NOTIFICATIONS_ENABLED=false`. Do not drop tables, columns, functions, policies, copied leads, audit events, or notification history automatically.
+Preferred recovery is application-only: restore the prior Netlify deployment and disable intake and notifications. Retain all SMKH database objects and records for diagnosis.
 
-If database access must be disabled after a failed release, a database owner may revoke application grants on the new SMKH tables and `smkh_update_lead` after recording the incident and current counts. This retains all records for analysis and recovery. A destructive rollback would lose independent status changes, notes, follow-up dates, audit events, and notification logs created after cutover; it requires a separate reviewed script and explicit owner authorization.
+If database access must be disabled, an authorized database owner may revoke application grants on the new SMKH tables and functions after recording post-incident counts. Do not drop tables, functions, policies, memberships, leads, audit history, notifications, or rate-limit records automatically. Destructive removal requires a separately reviewed script, a verified backup, impact analysis, and explicit authorization.
 
-## Synthetic post-deployment test
-
-No production test record may be created without explicit authorization. When authorized, use conspicuously synthetic contact/property values, submit through the protected public endpoint with Turnstile, confirm one independent lead and one notification log, update it through `/admin`, and verify the audit event actor matches the authenticated administrator. Do not delete the record unless a specific safe cleanup procedure is separately approved.
-
-## Indexing, analytics, and legal gates
-
-The canonical origin is fixed to `https://sellmykernhome.com`. Sitemap entries are emitted only when `NEXT_PUBLIC_ROBOTS_INDEX=true`; draft seller pages and articles remain excluded through their approval flags. Before enabling indexing, review every emitted URL, public claim, privacy policy, terms, phone/email identity, and Google verification token. GA4 remains inert until a measurement ID is configured and a visitor grants consent. Tracking uses explicit path-only page views and allow-listed, PII-free events.
+Finally clear all temporary connection and owner variables from the operator process.
