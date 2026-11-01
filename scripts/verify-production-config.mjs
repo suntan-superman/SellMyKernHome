@@ -38,7 +38,7 @@ if (!secretKey.startsWith("sb_secret_")) fail("the server-only Supabase secret k
 if (siteUrl !== expected.siteUrl) fail("NEXT_PUBLIC_SITE_URL is not the production domain.");
 if (adminBaseUrl !== expected.siteUrl) fail("SMKH_ADMIN_BASE_URL is not the production domain.");
 if (process.env.SMKH_NOTIFICATIONS_ENABLED !== "false") fail("notifications must remain disabled.");
-if (process.env.NEXT_PUBLIC_ROBOTS_INDEX !== "false") fail("search indexing must remain disabled.");
+if (process.env.NEXT_PUBLIC_ROBOTS_INDEX !== "true") fail("search indexing must be enabled for this approved release.");
 if (notificationRecipient.toLowerCase() !== expected.ownerEmail) fail("the notification recipient is not the Workside owner only.");
 if (!/^G-[A-Z0-9]+$/.test(gaMeasurementId)) fail("NEXT_PUBLIC_GA_MEASUREMENT_ID is not a valid GA4 measurement ID.");
 
@@ -81,5 +81,5 @@ if (
 }
 
 console.log(
-  `Production configuration verified for ${expected.projectRef}, ${expected.ownerDisplayName}, notifications disabled, and indexing disabled.`,
+  `Production configuration verified for ${expected.projectRef}, ${expected.ownerDisplayName}, notifications disabled, and indexing enabled.`,
 );

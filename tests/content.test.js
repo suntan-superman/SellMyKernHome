@@ -128,7 +128,7 @@ test("Netlify production builds fail closed on PI identity and launch gates", ()
   assert.match(verification, /sroy@worksidesoftware\.com/);
   assert.match(verification, /Workside Software/);
   assert.match(verification, /SMKH_NOTIFICATIONS_ENABLED[^\n]+"false"/);
-  assert.match(verification, /NEXT_PUBLIC_ROBOTS_INDEX[^\n]+"false"/);
+  assert.match(verification, /NEXT_PUBLIC_ROBOTS_INDEX[^\n]+"true"/);
   assert.match(verification, /NEXT_PUBLIC_GA_MEASUREMENT_ID/);
   assert.match(verification, /\^G-\[A-Z0-9\]\+\$/);
   assert.match(verification, /smkh_admin_memberships/);
