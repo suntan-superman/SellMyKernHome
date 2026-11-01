@@ -1,0 +1,21 @@
+\set ON_ERROR_STOP on
+
+\if :{?owner_user_id}
+\else
+  \echo 'owner_user_id is required; supply the verified Supabase Auth UUID with --set.'
+  \quit 3
+\endif
+\if :{?owner_email}
+\else
+  \echo 'owner_email is required; supply the verified Auth email with --set.'
+  \quit 3
+\endif
+\if :{?owner_display_name}
+\else
+  \echo 'owner_display_name is required; supply the approved display name with --set.'
+  \quit 3
+\endif
+
+select pg_catalog.set_config('smkh.bootstrap_owner_user_id', :'owner_user_id', false) is not null as owner_id_context_set;
+select pg_catalog.set_config('smkh.bootstrap_owner_email', :'owner_email', false) is not null as owner_email_context_set;
+select pg_catalog.set_config('smkh.bootstrap_owner_display_name', :'owner_display_name', false) is not null as owner_display_context_set;

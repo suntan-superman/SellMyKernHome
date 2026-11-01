@@ -1,20 +1,47 @@
 -- Additive production migration for an independent Sell My Kern Home workflow.
--- This migration copies SMKH seller records and memberships without deleting or
+-- This migration copies SMKH seller records without deleting or
 -- updating any GNZ table, record, privilege, function, trigger, or auth user.
+-- The execution session must provide a verified owner Auth UUID, matching email,
+-- and display name through the smkh.bootstrap_owner_* settings.
 begin;
 
 do $preflight$
+declare
+  owner_id_text pg_catalog.text := nullif(pg_catalog.current_setting('smkh.bootstrap_owner_user_id', true), '');
+  owner_email pg_catalog.text := nullif(pg_catalog.current_setting('smkh.bootstrap_owner_email', true), '');
+  owner_display_name pg_catalog.text := nullif(pg_catalog.current_setting('smkh.bootstrap_owner_display_name', true), '');
+  owner_id pg_catalog.uuid;
 begin
   if pg_catalog.to_regclass('public.gnz_leads') is null then
     raise exception 'Required source table public.gnz_leads is missing.';
-  end if;
-  if pg_catalog.to_regclass('public.admin_users') is null then
-    raise exception 'Required source table public.admin_users is missing.';
   end if;
   if pg_catalog.to_regclass('public.smkh_lead_audit') is null
     or pg_catalog.to_regclass('public.smkh_notification_logs') is null
     or pg_catalog.to_regclass('public.smkh_rate_limits') is null then
     raise exception 'The verified 20261014 SMKH support objects are missing.';
+  end if;
+  if pg_catalog.to_regclass('public.smkh_leads') is not null
+    or pg_catalog.to_regclass('public.smkh_admin_memberships') is not null
+    or pg_catalog.to_regclass('public.smkh_lead_events') is not null
+    or pg_catalog.to_regclass('public.smkh_notifications') is not null then
+    raise exception 'Independent SMKH objects already exist; refusing repeat or partial application.';
+  end if;
+  if owner_id_text is null or owner_email is null or owner_display_name is null then
+    raise exception 'Verified owner bootstrap context is required.';
+  end if;
+  begin
+    owner_id := owner_id_text::pg_catalog.uuid;
+  exception when invalid_text_representation then
+    raise exception 'The verified owner Auth user ID is not a valid UUID.';
+  end;
+  if pg_catalog.length(owner_display_name) > 120 then
+    raise exception 'The owner display name exceeds 120 characters.';
+  end if;
+  if not exists (
+    select 1 from auth.users
+    where id = owner_id and pg_catalog.lower(email) = pg_catalog.lower(owner_email)
+  ) then
+    raise exception 'The supplied owner UUID and email do not match an existing Supabase Auth user.';
   end if;
   if exists (
     select 1 from public.gnz_leads
@@ -43,10 +70,12 @@ create table if not exists public.smkh_admin_memberships (
   updated_at pg_catalog.timestamptz not null default pg_catalog.now()
 );
 
-insert into public.smkh_admin_memberships (user_id, display_name, role, active, created_at, updated_at)
-select user_id, display_name, 'admin', true, created_at, pg_catalog.now()
-from public.admin_users
-on conflict (user_id) do nothing;
+insert into public.smkh_admin_memberships (user_id, display_name, role, active)
+select
+  pg_catalog.current_setting('smkh.bootstrap_owner_user_id')::pg_catalog.uuid,
+  pg_catalog.current_setting('smkh.bootstrap_owner_display_name'),
+  'owner',
+  true;
 
 create table if not exists public.smkh_leads (
   id pg_catalog.uuid primary key default pg_catalog.gen_random_uuid(),
@@ -82,6 +111,7 @@ create table if not exists public.smkh_leads (
   last_contacted_at pg_catalog.timestamptz,
   archived_at pg_catalog.timestamptz,
   archived_by pg_catalog.uuid,
+  legacy_assigned_to pg_catalog.uuid,
   legacy_gnz_lead_id pg_catalog.uuid unique,
   legacy_status pg_catalog.text
 );
@@ -103,10 +133,10 @@ insert into public.smkh_leads (
   preferred_contact, service, message, property_address, property_city,
   property_zip, property_type, property_condition, occupancy, desired_timing,
   attribution, consent, status, assigned_to, internal_notes, archived_at,
-  archived_by, legacy_gnz_lead_id, legacy_status
+  archived_by, legacy_assigned_to, legacy_gnz_lead_id, legacy_status
 )
 select
-  g.id, g.reference, g.submission_token, g.source, 'sellmykernhome.com', 'seller',
+  g.id, g.reference, g.submission_token, g.source, g.source_site, 'seller',
   g.created_at, g.updated_at, g.first_name, g.last_name, g.company_name,
   g.phone, g.email, g.preferred_contact, g.service, g.message,
   g.property_address, g.property_city, g.property_zip, g.property_type,
@@ -119,10 +149,9 @@ select
     when g.status = 'archived' then 'lost'
     else 'new'
   end,
-  case when m.user_id is not null then g.assigned_to else null end,
-  g.internal_notes, g.archived_at, g.archived_by, g.id, g.status
+  null,
+  g.internal_notes, g.archived_at, g.archived_by, g.assigned_to, g.id, g.status
 from public.gnz_leads as g
-left join public.smkh_admin_memberships as m on m.user_id = g.assigned_to
 where g.lead_type = 'seller' or g.source_site = 'sellmykernhome.com'
 on conflict (id) do nothing;
 
@@ -145,7 +174,7 @@ insert into public.smkh_lead_events (
 )
 select
   a.lead_id, a.action, a.actor_id,
-  case when a.actor_kind = 'admin' then 'admin' else 'system' end,
+  case when a.actor_kind in ('admin', 'system', 'migration') then a.actor_kind else 'system' end,
   a.before_state, a.after_state, a.created_at, a.id
 from public.smkh_lead_audit as a
 join public.smkh_leads as l on l.id = a.lead_id

@@ -1,0 +1,4 @@
+\set ON_ERROR_STOP on
+\ir 20261101_smkh_set_owner_context.psql
+\ir ../migrations/20261101_smkh_independent_workflow.sql
+\ir 20261101_smkh_independent_postflight.sql

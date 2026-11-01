@@ -2,10 +2,14 @@
 -- Save the complete output with the release record and compare it to the backup manifest.
 begin transaction isolation level repeatable read read only;
 
-select current_database() as database_name, pg_catalog.current_user as database_role,
+select current_database() as database_name, current_user as database_role,
        pg_catalog.now() as checked_at;
 
 do $preflight$
+declare
+  owner_id_text pg_catalog.text := nullif(pg_catalog.current_setting('smkh.bootstrap_owner_user_id', true), '');
+  owner_email pg_catalog.text := nullif(pg_catalog.current_setting('smkh.bootstrap_owner_email', true), '');
+  owner_id pg_catalog.uuid;
 begin
   if pg_catalog.to_regclass('public.gnz_leads') is null
      or pg_catalog.to_regclass('public.admin_users') is null
@@ -20,8 +24,29 @@ begin
      or pg_catalog.to_regclass('public.smkh_notifications') is not null then
     raise exception 'Independent SMKH objects already exist; stop to prevent an unreviewed repeat application.';
   end if;
+  if owner_id_text is null or owner_email is null
+     or nullif(pg_catalog.current_setting('smkh.bootstrap_owner_display_name', true), '') is null then
+    raise exception 'Verified owner bootstrap context is required.';
+  end if;
+  begin
+    owner_id := owner_id_text::pg_catalog.uuid;
+  exception when invalid_text_representation then
+    raise exception 'The verified owner Auth user ID is not a valid UUID.';
+  end;
+  if not exists (
+    select 1 from auth.users
+    where id = owner_id and pg_catalog.lower(email) = pg_catalog.lower(owner_email)
+  ) then
+    raise exception 'The supplied owner UUID and email do not match an existing Supabase Auth user.';
+  end if;
 end;
 $preflight$;
+
+select exists (
+  select 1 from auth.users
+  where id = pg_catalog.current_setting('smkh.bootstrap_owner_user_id')::pg_catalog.uuid
+    and pg_catalog.lower(email) = pg_catalog.lower(pg_catalog.current_setting('smkh.bootstrap_owner_email'))
+) as verified_owner_auth_match;
 
 select
   (select count(*) from public.gnz_leads) as gnz_leads_total,

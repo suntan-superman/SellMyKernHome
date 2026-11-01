@@ -25,6 +25,18 @@ test("admin mutations derive the actor from the authenticated database session",
   assert.match(migration, /to authenticated/);
 });
 
+test("migration bootstraps only an explicitly verified owner and never copies GNZ memberships", () => {
+  const migration = fs.readFileSync(path.join(root, "supabase/migrations/20261101_smkh_independent_workflow.sql"), "utf8");
+  const applyWrapper = fs.readFileSync(path.join(root, "supabase/verification/20261101_smkh_apply_and_postflight.psql"), "utf8");
+  assert.match(migration, /smkh\.bootstrap_owner_user_id/);
+  assert.match(migration, /supplied owner UUID and email do not match an existing Supabase Auth user/i);
+  assert.match(migration, /'owner',\s*true/);
+  assert.doesNotMatch(migration, /from public\.admin_users/i);
+  assert.match(applyWrapper, /20261101_smkh_set_owner_context\.psql/);
+  assert.match(applyWrapper, /20261101_smkh_independent_workflow\.sql/);
+  assert.match(applyWrapper, /20261101_smkh_independent_postflight\.sql/);
+});
+
 test("production code contains no staging environment selection", () => {
   for (const relative of ["lib/supabase.js", "lib/leads.js", "lib/notifications.js", "netlify.toml", ".env.example"]) {
     const source = fs.readFileSync(path.join(root, relative), "utf8");
