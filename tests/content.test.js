@@ -10,6 +10,14 @@ test("all required public routes exist", () => {
   const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/terms/page.js","app/thank-you/page.js"];
   for (const route of routes) assert.equal(fs.existsSync(path.join(root, route)), true, route);
 });
+test("admin login provides an accessible password visibility control", () => {
+  const field = read("components/AdminPasswordField.js");
+  const page = read("app/admin/login/page.js");
+  assert.match(page, /<AdminPasswordField \/>/);
+  assert.match(field, /aria-label=\{visible \? "Hide password" : "Show password"\}/);
+  assert.match(field, /type=\{visible \? "text" : "password"\}/);
+  assert.match(field, /type="button"/);
+});
 test("crawl controls keep production indexing behind an explicit release gate", () => {
   const layout = read("app/layout.js");
   const robots = read("app/robots.js");

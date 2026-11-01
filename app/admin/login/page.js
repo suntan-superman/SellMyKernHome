@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { LockKeyhole } from "lucide-react";
 import { getAdminContext, safeAdminDestination } from "@/lib/admin-session";
+import AdminPasswordField from "@/components/AdminPasswordField";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Admin Sign In", robots: { index: false, follow: false, noarchive: true } };
@@ -21,8 +22,7 @@ export default async function AdminLoginPage({ searchParams }) {
         <input type="hidden" name="next" value={destination} />
         <label htmlFor="admin-email">Email address</label>
         <input id="admin-email" name="email" type="email" autoComplete="username" required />
-        <label htmlFor="admin-password">Password</label>
-        <input id="admin-password" name="password" type="password" autoComplete="current-password" required />
+        <AdminPasswordField />
         <button className="button" type="submit">Sign in</button>
       </form>
       <p className="admin-form-note">Access is authenticated through Supabase and restricted by independent SMKH membership.</p>

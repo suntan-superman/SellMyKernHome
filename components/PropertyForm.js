@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, LoaderCircle, LockKeyhole } from "lucide-react";
 import { track } from "@/lib/analytics";
+import { formatPhoneNumber } from "@/lib/validation";
 import TurnstileWidget from "./TurnstileWidget";
 
 const empty = {
@@ -21,16 +22,6 @@ function firstStepErrors(data) {
   if (data.preferredContact === "phone" && data.phone.replace(/\D/g, "").length < 10) next.phone = "Enter a valid phone number.";
   if (!data.privacyAcknowledged) next.privacyAcknowledged = "Please acknowledge the privacy notice.";
   return next;
-}
-
-function formatPhone(value) {
-  let digits = String(value || "").replace(/\D/g, "");
-  if (digits.length > 10 && digits.startsWith("1")) digits = digits.slice(1);
-  digits = digits.slice(0, 10);
-  if (!digits) return "";
-  if (digits.length <= 3) return `(${digits}`;
-  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
 }
 
 function getAttribution() {
@@ -73,7 +64,7 @@ export default function PropertyForm({ compact = false, initialAddress = "", tur
   }
 
   function updatePhone(event) {
-    setData((current) => ({ ...current, phone: formatPhone(event.target.value) }));
+    setData((current) => ({ ...current, phone: formatPhoneNumber(event.target.value) }));
     setErrors((current) => ({ ...current, phone: undefined }));
     if (!started.current) { started.current = true; track("seller_form_start", { form: "seller_inquiry" }); }
   }
@@ -128,7 +119,7 @@ export default function PropertyForm({ compact = false, initialAddress = "", tur
       <div><label htmlFor="propertyZip">ZIP code</label><input id="propertyZip" name="propertyZip" inputMode="numeric" autoComplete="postal-code" value={data.propertyZip} onChange={update} aria-invalid={Boolean(errors.propertyZip)} aria-describedby={describedBy("propertyZip")} placeholder="93301" />{fieldError("propertyZip")}</div>
       <div className="field-wide"><label htmlFor="name">Your name</label><input id="name" name="name" autoComplete="name" value={data.name} onChange={update} aria-invalid={Boolean(errors.name)} aria-describedby={describedBy("name")} />{fieldError("name")}</div>
       <fieldset className="field-wide"><legend>How should we contact you?</legend><div className="choice-row"><label><input type="radio" name="preferredContact" value="email" checked={data.preferredContact === "email"} onChange={update} /> Email</label><label><input type="radio" name="preferredContact" value="phone" checked={data.preferredContact === "phone"} onChange={update} /> Phone</label></div></fieldset>
-      {data.preferredContact === "email" ? <div className="field-wide"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" value={data.email} onChange={update} aria-invalid={Boolean(errors.email)} aria-describedby={describedBy("email")} />{fieldError("email")}</div> : <div className="field-wide"><label htmlFor="phone">Phone number</label><input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel-national" maxLength="14" value={data.phone} onChange={updatePhone} aria-invalid={Boolean(errors.phone)} aria-describedby={describedBy("phone")} placeholder="(661) 555-1234" />{fieldError("phone")}</div>}
+      {data.preferredContact === "email" ? <div className="field-wide"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" value={data.email} onChange={update} aria-invalid={Boolean(errors.email)} aria-describedby={describedBy("email")} />{fieldError("email")}</div> : <div className="field-wide"><label htmlFor="phone">Phone number</label><input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel-national" maxLength="14" pattern={"\\([0-9]{3}\\) [0-9]{3}-[0-9]{4}"} value={data.phone} onChange={updatePhone} aria-invalid={Boolean(errors.phone)} aria-describedby={describedBy("phone")} placeholder="(661) 555-1234" />{fieldError("phone")}</div>}
       <label className="check-field field-wide"><input type="checkbox" name="privacyAcknowledged" checked={data.privacyAcknowledged} onChange={update} aria-invalid={Boolean(errors.privacyAcknowledged)} /><span>I understand {recipientName} will use this information to review my inquiry and contact me about this property. See the <a href="/privacy-policy" target="_blank">Privacy Policy</a>.</span></label>{fieldError("privacyAcknowledged")}
       <div className="honeypot" aria-hidden="true"><label htmlFor="website">Website</label><input id="website" name="website" tabIndex="-1" autoComplete="off" value={data.website} onChange={update} /></div>
       <button className="button field-wide" type="button" onClick={continueForm} disabled={!firstStepIsValid} title={!firstStepIsValid ? "Complete all required fields to continue." : undefined}>Continue <ArrowRight size={18} /></button>
