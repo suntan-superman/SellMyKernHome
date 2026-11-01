@@ -32,7 +32,7 @@ if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SECRET_KEY && p
   report.supabase.service_connection = base.error ? `failed:${base.error.code || "unknown"}` : "ok";
   report.supabase.base_schema = base.error ? "unavailable" : "smkh_leads_present";
 
-  const sellerColumns = await service.from("smkh_leads").select("id,lead_type,source_site,preferred_contact,property_address,property_city,property_zip,property_type,property_condition,occupancy,desired_timing,attribution,consent,assigned_to,follow_up_at,legacy_gnz_lead_id").limit(0);
+  const sellerColumns = await service.from("smkh_leads").select("id,lead_type,source_site,preferred_contact,property_address,property_city,property_zip,property_type,property_condition,occupancy,desired_timing,attribution,consent,assigned_to,follow_up_at").limit(0);
   const deliveryTable = await service.from("smkh_notifications").select("id").limit(0);
   report.supabase.seller_migration = !sellerColumns.error && !deliveryTable.error ? "present" : "not_present";
 

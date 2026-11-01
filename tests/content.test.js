@@ -94,6 +94,17 @@ test("analytics requires consent, disables automatic page views, and omits query
   assert.match(analytics, /page_path: pathname/);
   assert.doesNotMatch(analytics, /useSearchParams|window\.location\.search/);
 });
+
+test("Netlify production builds fail closed on PI identity and launch gates", () => {
+  const verification = read("scripts/verify-production-config.mjs");
+  assert.match(verification, /jsrvdryddojhkmjzotef/);
+  assert.match(verification, /sroy@worksidesoftware\.com/);
+  assert.match(verification, /Workside Software/);
+  assert.match(verification, /SMKH_NOTIFICATIONS_ENABLED[^\n]+"false"/);
+  assert.match(verification, /NEXT_PUBLIC_ROBOTS_INDEX[^\n]+"false"/);
+  assert.match(verification, /smkh_admin_memberships/);
+  assert.doesNotMatch(verification, /console\.log\([^)]*(?:secretKey|publishableKey)/);
+});
 test("seller endpoint validates before server-side lead creation", () => {
   const route = read("app/api/leads/route.js");
   assert.match(route, /candidate === requestOrigin/);
