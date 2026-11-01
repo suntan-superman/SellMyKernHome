@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2, Handshake, MapPin, MessageCircle, ShieldCheck } from "lucide-react";
 import PropertyForm from "@/components/PropertyForm";
+import { getSellerFormConfiguration } from "@/lib/form-config";
 import SituationGrid from "@/components/SituationGrid";
 import Process from "@/components/Process";
 import CTA from "@/components/CTA";
@@ -15,6 +16,7 @@ const faqs = [
 ];
 
 export default function HomePage() {
+  const form = getSellerFormConfiguration();
   const websiteSchema = { "@context": "https://schema.org", "@graph": [
     { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: SITE_NAME, url: SITE_URL, parentOrganization: { "@type": "Organization", name: "GNZ Marketing Group, LLC" } },
     { "@type": "WebSite", "@id": `${SITE_URL}/#website`, name: SITE_NAME, url: SITE_URL, publisher: { "@id": `${SITE_URL}/#organization` }, inLanguage: "en-US" },
@@ -24,10 +26,10 @@ export default function HomePage() {
     <section className="hero">
       <div className="hero-copy"><p className="eyebrow">BAKERSFIELD &amp; KERN COUNTY</p><h1>Thinking About Selling Your Kern County Home?</h1><p className="hero-subhead">Tell us about your property and what you&apos;re hoping to accomplish. We&apos;ll review the details and contact you to discuss possible next steps—without pressure.</p><div className="hero-trust"><span><ShieldCheck /> Private inquiry</span><span><MessageCircle /> Clear next steps</span><span><Handshake /> No obligation to submit</span></div></div>
       <div className="hero-visual"><Image src="/images/modern-home-exterior.jpg" alt="Contemporary home with clean lines and a landscaped front entry" fill priority sizes="(max-width: 900px) 100vw, 52vw" /><span className="image-caption"><MapPin size={15} /> Serving Bakersfield &amp; Kern County</span></div>
-      <div className="hero-form-wrap"><PropertyForm compact /></div>
+      <div className="hero-form-wrap"><PropertyForm compact {...form} /></div>
     </section>
 
-    <section className="reassurance"><p><strong>A useful conversation starts with the property—not pressure.</strong> Your inquiry goes to the GNZ team for review. Share only what feels relevant now.</p></section>
+    <section className="reassurance"><p><strong>A useful conversation starts with the property—not pressure.</strong> Your inquiry goes to the {form.recipientTeam} for review. Share only what feels relevant now.</p></section>
 
     <section className="section content-shell"><div className="section-heading"><div><p className="eyebrow">WHERE WE CAN START</p><h2>Situations We Can Discuss</h2></div><p>Every property comes with a different story. These guides can help you organize the facts and questions that matter before a conversation.</p></div><SituationGrid /><p className="section-link"><Link className="text-link" href="/sell-your-house-bakersfield">Compare Bakersfield home-selling options <ArrowRight size={17} /></Link></p></section>
 

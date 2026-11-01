@@ -45,7 +45,7 @@ const server = http.createServer(async (request, response) => {
     state.events.push("rate_limit");
     return json(response, 200, [{ allowed: count <= Number(input.p_request_limit), retry_after: count > Number(input.p_request_limit) ? 60 : 0 }]);
   }
-  if (request.method === "POST" && url.pathname === "/rest/v1/gnz_leads") {
+  if (request.method === "POST" && ["/rest/v1/gnz_leads", "/rest/v1/smkh_leads"].includes(url.pathname)) {
     const record = await body(request);
     const lead = { ...record, id: randomUUID() };
     state.leads.push(lead);

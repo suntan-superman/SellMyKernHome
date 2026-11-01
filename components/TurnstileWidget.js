@@ -3,8 +3,7 @@
 import Script from "next/script";
 import { useEffect, useRef } from "react";
 
-export default function TurnstileWidget({ onToken, onStatus = () => {}, resetSignal = 0 }) {
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+export default function TurnstileWidget({ siteKey, onToken, onStatus = () => {}, resetSignal = 0 }) {
   const container = useRef(null), widgetId = useRef(null);
   const acceptToken = (token) => { onToken(token); onStatus(""); };
   const rejectToken = (message) => { onToken(""); onStatus(message); };
@@ -25,7 +24,7 @@ export default function TurnstileWidget({ onToken, onStatus = () => {}, resetSig
       onToken("");
     }
   }, [resetSignal]);
-  if (!siteKey) return process.env.NODE_ENV === "production" ? <p className="field-error">Anti-spam configuration is required before submissions can be enabled.</p> : null;
+  if (!siteKey) return <p className="field-error">Anti-spam configuration is required before submissions can be enabled.</p>;
   return <div role="group" aria-label="Anti-spam verification"><Script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" strategy="afterInteractive" onLoad={renderWidget} /><div ref={container} /></div>;
 }
 

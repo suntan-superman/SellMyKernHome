@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Analytics from "@/components/Analytics";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, isIndexingEnabled } from "@/lib/site";
+import { isAnalyticsEnabled } from "@/lib/runtime";
 import "./globals.css";
 
 const display = Cormorant_Garamond({ subsets: ["latin"], variable: "--font-display", weight: ["500", "600", "700"], display: "swap" });
@@ -30,7 +31,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  const gaId = isAnalyticsEnabled() ? process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID : "";
   return (
     <html lang="en" className={`${display.variable} ${sans.variable}`} data-scroll-behavior="smooth">
       <body>

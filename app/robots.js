@@ -1,6 +1,8 @@
 import { SITE_URL, isIndexingEnabled } from "@/lib/site";
+import { isDemoMode } from "@/lib/runtime";
 
 export default function robots() {
+  if (isDemoMode()) return { rules: { userAgent: "*", disallow: "/" } };
   const indexable = isIndexingEnabled();
   return {
     rules: { userAgent: "*", allow: "/", disallow: ["/api/", "/thank-you"] },

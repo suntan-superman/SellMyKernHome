@@ -10,12 +10,12 @@ test("all required public routes exist", () => {
   const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/terms/page.js","app/thank-you/page.js"];
   for (const route of routes) assert.equal(fs.existsSync(path.join(root, route)), true, route);
 });
-test("disabled indexing uses rendered noindex without blocking public crawling", () => {
+test("crawl controls preserve public discovery while private staging disallows all", () => {
   const layout = read("app/layout.js");
   const robots = read("app/robots.js");
   assert.match(layout, /robots: indexable \? \{ index: true, follow: true \} : \{ index: false, follow: true \}/);
   assert.match(robots, /allow: "\/"/);
-  assert.doesNotMatch(robots, /disallow: "\/"/);
+  assert.match(robots, /if \(isDemoMode\(\)\) return \{ rules: \{ userAgent: "\*", disallow: "\/" \} \}/);
 });
 test("canonical origin and sitemap are permanently domain-scoped", () => {
   assert.match(read("lib/site.js"), /https:\/\/sellmykernhome\.com/);

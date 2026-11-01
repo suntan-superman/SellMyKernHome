@@ -6,6 +6,10 @@ const mockPort = "54321";
 const appPort = "3000";
 const sharedEnvironment = {
   ...process.env,
+  SMKH_ENVIRONMENT: "local",
+  SMKH_DEMO_MODE: "false",
+  SMKH_ENABLE_STAGING_ANALYTICS: "false",
+  SMKH_ENABLE_STAGING_EMAIL: "false",
   NEXT_PUBLIC_SITE_URL: `http://127.0.0.1:${appPort}`,
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: "1x00000000000000000000AA",
   TURNSTILE_SECRET_KEY: "1x0000000000000000000000000000000AA",

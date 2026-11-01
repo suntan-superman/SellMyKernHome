@@ -4,6 +4,8 @@ import { createServiceClient } from "@/lib/supabase";
 import { checkRateLimit, getRequestIp, verifyTurnstile } from "@/lib/rateLimit";
 import { passesHoneypot, validateSellerLead } from "@/lib/validation";
 import { SITE_URL } from "@/lib/site";
+import { hasDemoAccess } from "@/lib/demo-access";
+import { isDemoMode } from "@/lib/runtime";
 
 function isAllowedOrigin(request) {
   const origin = request.headers.get("origin"); if (!origin) return true;
@@ -16,6 +18,7 @@ function isAllowedOrigin(request) {
   } catch { return false; }
 }
 export async function POST(request) {
+  if (isDemoMode() && !(await hasDemoAccess())) return NextResponse.json({ message: "Private staging authentication is required." }, { status: 401 });
   if (!isAllowedOrigin(request)) return NextResponse.json({ message: "Request origin was not accepted." }, { status: 403 });
   if (Number(request.headers.get("content-length") || 0) > 32 * 1024) return NextResponse.json({ message: "The request is too large." }, { status: 413 });
   const ip = getRequestIp(request), client = createServiceClient();
