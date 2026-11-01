@@ -1,10 +1,8 @@
 import { Cormorant_Garamond, Manrope } from "next/font/google";
-import Script from "next/script";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Analytics from "@/components/Analytics";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, isIndexingEnabled } from "@/lib/site";
-import { isAnalyticsEnabled } from "@/lib/runtime";
 import "./globals.css";
 
 const display = Cormorant_Garamond({ subsets: ["latin"], variable: "--font-display", weight: ["500", "600", "700"], display: "swap" });
@@ -16,6 +14,7 @@ export const metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: "Sell My Kern Home | A Thoughtful Way to Discuss Your Property", template: "%s | Sell My Kern Home" },
   description: SITE_DESCRIPTION,
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } : undefined,
   alternates: { canonical: "/" },
   robots: indexable ? { index: true, follow: true } : { index: false, follow: true },
   openGraph: {
@@ -31,7 +30,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  const gaId = isAnalyticsEnabled() ? process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID : "";
+  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim() || "";
   return (
     <html lang="en" className={`${display.variable} ${sans.variable}`} data-scroll-behavior="smooth">
       <body>
@@ -39,11 +38,7 @@ export default function RootLayout({ children }) {
         <Header />
         {children}
         <Footer />
-        <Analytics />
-        {gaId ? <>
-          <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />
-          <Script id="ga4" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${gaId}',{send_page_view:true,allow_google_signals:false});`}</Script>
-        </> : null}
+        <Analytics measurementId={gaId} />
       </body>
     </html>
   );

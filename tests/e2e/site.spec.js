@@ -14,7 +14,7 @@ test("homepage, navigation, and seller form are accessible", async ({ page }) =>
   await page.getByLabel("Your name").fill("Synthetic Seller");
   await page.getByLabel("Email address").fill("seller@example.test");
   await expect(continueButton).toBeDisabled();
-  const privacy = page.getByRole("checkbox", { name: /I understand GNZ Marketing/ });
+  const privacy = page.getByRole("checkbox", { name: /I understand Sell My Kern Home/ });
   await privacy.check();
   await expect(privacy).toBeChecked();
   await expect(continueButton).toBeEnabled();

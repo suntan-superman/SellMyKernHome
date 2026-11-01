@@ -1,5 +1,7 @@
 # Adam partnership demonstration — Phase B verification
 
+> Historical verification only. The owner canceled this staging path on November 1, 2026.
+
 **Verified:** November 1, 2026
 **Implementation base:** local `main` at `c3ed843` plus the uncommitted Phase B worktree
 **External actions:** none

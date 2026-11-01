@@ -1,5 +1,7 @@
 # Adam partnership demonstration — Phase B architecture and isolation
 
+> Superseded on November 1, 2026. Do not provision or deploy the staging design described below.
+
 **Prepared:** November 1, 2026
 **Baseline:** [`docs/adam-demo/01-repository-audit.md`](../adam-demo/01-repository-audit.md). The requested `docs/adam-partnership/01-repository-audit.md` path did not exist, so the completed Phase A report was used without moving or duplicating it.
 **Status:** Local implementation prepared; no external resource provisioned and no production change authorized.

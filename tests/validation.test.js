@@ -22,5 +22,5 @@ test("rejects unknown select values and missing privacy acknowledgement", () => 
 test("honeypot rejects bots, instant posts, and stale forms", () => {
   const now = Date.now(); assert.equal(passesHoneypot({ website: "spam", startedAt: now - 5000 }, now), false); assert.equal(passesHoneypot({ website: "", startedAt: now - 100 }, now), false); assert.equal(passesHoneypot({ website: "", startedAt: now - 25 * 60 * 60 * 1000 }, now), false); assert.equal(passesHoneypot({ website: "", startedAt: now - 5000 }, now), true);
 });
-test("splits a display name for the existing GNZ schema", () => assert.deepEqual(splitName("Synthetic Test Seller"), { firstName: "Synthetic", lastName: "Test Seller" }));
+test("splits a display name for independent SMKH storage", () => assert.deepEqual(splitName("Synthetic Test Seller"), { firstName: "Synthetic", lastName: "Test Seller" }));
 

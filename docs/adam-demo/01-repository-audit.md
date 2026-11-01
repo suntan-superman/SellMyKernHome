@@ -1,5 +1,7 @@
 # Adam partnership demonstration — Phase A repository audit
 
+> Historical audit only. The owner canceled the staging/partnership-demo architecture on November 1, 2026; this file is not an implementation or deployment instruction.
+
 **Audit date:** November 1, 2026
 **Scope:** Read-only inspection of the `SellMyKernHome` repository, its public deployment output, and repository documentation.
 **Repository state audited:** `main` at `c3ed843aaf13a88930cbb4d5465d9c54ff27af5a`

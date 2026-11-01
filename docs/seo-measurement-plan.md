@@ -5,7 +5,7 @@
 - Treat rankings and traffic as diagnostic indicators, not business outcomes.
 - Count a lead conversion only after `POST /api/leads` returns success. A form start, validation event, Turnstile completion, or button click is not a lead.
 - Never send name, property address, email, telephone, comments, seller reference, Turnstile token, or other PII to analytics.
-- Preserve UTM/referrer values in the existing trusted lead flow for authorized GNZ Admin review; do not duplicate personal lead data into GA4.
+- Preserve UTM/referrer values in the independent lead flow for authorized SMKH Admin review; do not duplicate personal lead data into GA4.
 - GA4 remains inactive until a genuine Measurement ID and any required consent approach are approved.
 
 ## Event specification
@@ -15,6 +15,8 @@
 | `seller_form_start` | First user change in the seller form | `form` | At most once per mounted form. |
 | `seller_form_validation_error` | Client required-field validation fails or server returns field validation errors | `form`, `step`, `error_count`, `source` | Diagnostic only; never a conversion. No field values or field-specific PII. |
 | `seller_form_submit_success` | Server returns an accepted lead result after validation, Turnstile, rate limiting, and database handling | `form` | Primary web lead event. Fires before navigation and only on a successful response. |
+| `generate_lead` | Same successful stored-lead response | `form`, `source` | GA4-standard conversion event; emitted once and never contains a lead identifier or PII. |
+| `page_view` | Consent granted and the pathname changes | `page_path`, GA-managed page fields | Explicit path-only page view; automatic page views are disabled and query strings are omitted. |
 | `primary_cta_click` | Click on a marked primary seller-form CTA | `location`, `destination` | Engagement only. Destination is path-only. |
 | `phone_click` | Click on a `tel:` link if an approved number is later added | `location` | Engagement only; the telephone value is not sent. |
 | `email_click` | Click on a `mailto:` link if an approved address is later added | `location` | Engagement only; the address is not sent. |
@@ -28,9 +30,9 @@ The analytics helper removes parameter keys matching common PII names as a secon
 | Search visibility | Impressions, clicks, CTR, average position, indexed pages | Google Search Console domain property | Whether approved pages are discoverable for relevant queries. Position is directional and query/location dependent. |
 | Site acquisition | Organic users/sessions, landing pages, engaged sessions | Approved analytics platform | Whether search visits reach relevant experiences. |
 | Form behavior | Form starts, validation errors, primary CTA clicks | GA4 events above | Friction and engagement, not lead quality. |
-| Confirmed web leads | Successful seller form submissions | Server success event and GNZ Admin lead record | Primary conversion. Reconcile analytics with database records; the database is authoritative. |
-| Qualified inquiries | Seller leads judged relevant and contactable | GNZ Admin status/workflow | Business-quality measure; define qualification criteria before reporting. |
-| Downstream outcomes | Contacted, appointment/next step, not proceeding, and other approved GNZ statuses | GNZ Admin | Measures operational outcomes without making public transaction claims. |
+| Confirmed web leads | Successful seller form submissions | Server success event and independent SMKH lead record | Primary conversion. Reconcile analytics with database records; the database is authoritative. |
+| Qualified inquiries | Seller leads judged relevant and contactable | SMKH Admin status/workflow | Business-quality measure; define qualification criteria before reporting. |
+| Downstream outcomes | Contacted, appointment, offer made, under contract, closed, and lost | SMKH Admin | Measures operational outcomes without making public transaction claims. |
 
 Suggested review cadence after launch: weekly technical/search checks for the first month, monthly content/funnel review thereafter, and quarterly content accuracy/legal review.
 
@@ -39,10 +41,10 @@ Suggested review cadence after launch: weekly technical/search checks for the fi
 1. Obtain the actual GA4 web data-stream Measurement ID; never create or guess one in source.
 2. Approve the consent/privacy approach and configure the production Netlify variable without committing it.
 3. Verify DebugView using non-PII local or protected-preview interactions.
-4. Mark only `seller_form_submit_success` as the primary lead conversion.
+4. Mark `generate_lead` as the primary lead conversion; retain `seller_form_submit_success` as a diagnostic event rather than double-counting it.
 5. Confirm event parameters contain no PII and that a failed/blocked request does not fire success.
 6. Configure internal/developer traffic filtering where appropriate.
-7. Reconcile a controlled, separately authorized synthetic lead with GNZ Admin, then follow an explicitly approved cleanup process.
+7. Reconcile a controlled, separately authorized synthetic lead with SMKH Admin, then follow an explicitly approved cleanup process.
 
 ## Search Console and indexing checklist (after separate launch authorization)
 

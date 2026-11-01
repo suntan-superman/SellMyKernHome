@@ -14,7 +14,7 @@ const required = [
   "RESEND_API_KEY", "LEAD_NOTIFICATION_EMAIL", "EMAIL_FROM", "RATE_LIMIT_HMAC_SECRET",
 ];
 const recommended = [
-  "NEXT_PUBLIC_SITE_URL", "GNZ_ADMIN_BASE_URL", "NEXT_PUBLIC_TURNSTILE_SITE_KEY", "TURNSTILE_SECRET_KEY",
+  "NEXT_PUBLIC_SITE_URL", "SMKH_ADMIN_BASE_URL", "NEXT_PUBLIC_TURNSTILE_SITE_KEY", "TURNSTILE_SECRET_KEY",
 ];
 const missingRequired = required.filter((name) => !process.env[name]?.trim());
 const missingRecommended = recommended.filter((name) => !process.env[name]?.trim());
@@ -28,15 +28,15 @@ if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SECRET_KEY && p
   const clientOptions = { auth: { autoRefreshToken: false, persistSession: false }, realtime: { transport: WebSocket } };
   const service = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, clientOptions);
   const publishable = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, clientOptions);
-  const base = await service.from("gnz_leads").select("id", { head: true, count: "exact" });
+  const base = await service.from("smkh_leads").select("id", { head: true, count: "exact" });
   report.supabase.service_connection = base.error ? `failed:${base.error.code || "unknown"}` : "ok";
-  report.supabase.base_schema = base.error ? "unavailable" : "gnz_leads_present";
+  report.supabase.base_schema = base.error ? "unavailable" : "smkh_leads_present";
 
-  const sellerColumns = await service.from("gnz_leads").select("id,lead_type,source_site,preferred_contact,property_address,property_city,property_zip,property_type,property_condition,occupancy,desired_timing,attribution,consent,assigned_to").limit(0);
-  const deliveryTable = await service.from("smkh_notification_logs").select("id").limit(0);
+  const sellerColumns = await service.from("smkh_leads").select("id,lead_type,source_site,preferred_contact,property_address,property_city,property_zip,property_type,property_condition,occupancy,desired_timing,attribution,consent,assigned_to,follow_up_at,legacy_gnz_lead_id").limit(0);
+  const deliveryTable = await service.from("smkh_notifications").select("id").limit(0);
   report.supabase.seller_migration = !sellerColumns.error && !deliveryTable.error ? "present" : "not_present";
 
-  const anonymous = await publishable.from("gnz_leads").select("id").limit(1);
+  const anonymous = await publishable.from("smkh_leads").select("id").limit(1);
   report.supabase.anonymous_lead_access = anonymous.error ? "denied" : anonymous.data?.length ? "VISIBLE_SECURITY_FAILURE" : "zero_rows_visible";
 
   for (const suffix of ["", "2"]) {
@@ -47,7 +47,7 @@ if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SECRET_KEY && p
     const { data, error } = await authClient.auth.signInWithPassword({ email, password });
     let membership = "not_tested";
     if (data?.user?.id) {
-      const lookup = await service.from("admin_users").select("user_id").eq("user_id", data.user.id).maybeSingle();
+      const lookup = await authClient.from("smkh_admin_memberships").select("user_id,active").eq("user_id", data.user.id).eq("active", true).maybeSingle();
       membership = lookup.error ? "lookup_failed" : lookup.data ? "authorized" : "missing";
       await authClient.auth.signOut();
     }

@@ -6,10 +6,6 @@ const mockPort = "54321";
 const appPort = "3000";
 const sharedEnvironment = {
   ...process.env,
-  SMKH_ENVIRONMENT: "local",
-  SMKH_DEMO_MODE: "false",
-  SMKH_ENABLE_STAGING_ANALYTICS: "false",
-  SMKH_ENABLE_STAGING_EMAIL: "false",
   NEXT_PUBLIC_SITE_URL: `http://127.0.0.1:${appPort}`,
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: "1x00000000000000000000AA",
   TURNSTILE_SECRET_KEY: "1x0000000000000000000000000000000AA",
@@ -21,7 +17,7 @@ const sharedEnvironment = {
   LEAD_NOTIFICATION_EMAIL: "",
   EMAIL_FROM: "",
   EMAIL_REPLY_TO: "",
-  GNZ_ADMIN_BASE_URL: "",
+  SMKH_ADMIN_BASE_URL: `http://127.0.0.1:${appPort}`,
 };
 
 const mock = spawn(process.execPath, [path.join(projectRoot, "tests", "fixtures", "mock-supabase.mjs")], {

@@ -1,5 +1,7 @@
 # Adam partnership demonstration — Phase C certification checkpoint
 
+> Canceled on November 1, 2026. No Phase C staging infrastructure should be provisioned from this document.
+
 **Date:** November 1, 2026
 **Status:** Blocked safely before external provisioning
 **Production impact:** None

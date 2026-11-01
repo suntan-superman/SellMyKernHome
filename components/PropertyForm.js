@@ -47,7 +47,7 @@ function getAttribution() {
   };
 }
 
-export default function PropertyForm({ compact = false, initialAddress = "", turnstileSiteKey = "", recipientName = "GNZ Marketing" }) {
+export default function PropertyForm({ compact = false, initialAddress = "", turnstileSiteKey = "", recipientName = "Sell My Kern Home" }) {
   const router = useRouter();
   const startedAt = useRef(Date.now());
   const submissionToken = useRef(globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`);
@@ -107,6 +107,7 @@ export default function PropertyForm({ compact = false, initialAddress = "", tur
         return;
       }
       track("seller_form_submit_success", { form: "seller_inquiry" });
+      if (!result.duplicate) track("generate_lead", { form: "seller_inquiry", source: "seller_web" });
       router.push("/thank-you");
     } catch {
       setMessage("We could not connect. Please check your connection and try again.");

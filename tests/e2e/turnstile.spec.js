@@ -94,14 +94,17 @@ test("widget renders and a successful form creates the correctly attributed lead
   test.skip(testMode !== "pass", "Pass-mode verification.");
   const analyticsEvents = [];
   await page.exposeFunction("captureAnalyticsEvent", (...args) => analyticsEvents.push(args));
-  await page.addInitScript(() => { window.gtag = (...args) => window.captureAnalyticsEvent(...args); });
+  await page.addInitScript(() => {
+    window.localStorage.setItem("smkh_analytics_consent", "granted");
+    window.gtag = (...args) => window.captureAnalyticsEvent(...args);
+  });
   await page.goto("/?utm_source=turnstile-test&utm_medium=playwright");
   await page.getByLabel("Property street address").fill("123 Isolated Test Street");
   await page.getByLabel("City").fill("Bakersfield");
   await page.getByLabel("ZIP code").fill("93301");
   await page.getByLabel("Your name").fill("Turnstile Test");
   await page.getByLabel("Email address").fill("turnstile@example.invalid");
-  await page.getByRole("checkbox", { name: /I understand GNZ Marketing/ }).check();
+  await page.getByRole("checkbox", { name: /I understand Sell My Kern Home/ }).check();
   await page.waitForTimeout(1600);
   await page.getByRole("button", { name: "Continue" }).click();
   const widget = page.getByRole("group", { name: "Anti-spam verification" });
@@ -121,6 +124,7 @@ test("widget renders and a successful form creates the correctly attributed lead
   await expect(page.getByRole("heading", { name: /Thank you/ })).toBeVisible();
   expect(analyticsEvents.some((event) => event[0] === "event" && event[1] === "seller_form_start")).toBe(true);
   expect(analyticsEvents.filter((event) => event[0] === "event" && event[1] === "seller_form_submit_success")).toHaveLength(1);
+  expect(analyticsEvents.filter((event) => event[0] === "event" && event[1] === "generate_lead")).toHaveLength(1);
 
   const result = await state(request);
   expect(result.leads).toHaveLength(1);
@@ -144,7 +148,7 @@ test("form shows the server error and keeps the widget available for retry", asy
   await page.getByLabel("ZIP code").fill("93301");
   await page.getByLabel("Your name").fill("Turnstile Test");
   await page.getByLabel("Email address").fill("turnstile@example.invalid");
-  await page.getByRole("checkbox", { name: /I understand GNZ Marketing/ }).check();
+  await page.getByRole("checkbox", { name: /I understand Sell My Kern Home/ }).check();
   await page.waitForTimeout(1600);
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByRole("group", { name: "Anti-spam verification" })).toBeVisible();

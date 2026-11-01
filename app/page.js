@@ -18,7 +18,7 @@ const faqs = [
 export default function HomePage() {
   const form = getSellerFormConfiguration();
   const websiteSchema = { "@context": "https://schema.org", "@graph": [
-    { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: SITE_NAME, url: SITE_URL, parentOrganization: { "@type": "Organization", name: "GNZ Marketing Group, LLC" } },
+    { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: SITE_NAME, url: SITE_URL },
     { "@type": "WebSite", "@id": `${SITE_URL}/#website`, name: SITE_NAME, url: SITE_URL, publisher: { "@id": `${SITE_URL}/#organization` }, inLanguage: "en-US" },
   ] };
   return <main id="main-content">
@@ -42,7 +42,7 @@ export default function HomePage() {
       <article><span>04</span><div><h3>Respect for your decision</h3><p>You can ask questions, seek independent advice, and decide whether to continue.</p></div></article>
     </div></section>
 
-    <section className="section about-strip"><div className="content-shell"><div className="about-mark" aria-hidden="true">K</div><div><p className="eyebrow">ABOUT SELL MY KERN HOME</p><h2>A focused property-inquiry service, affiliated with GNZ Marketing.</h2><p>The site helps Kern County property owners organize basic facts and request a conversation. An inquiry does not create an agency, brokerage, purchase, or other contractual relationship, and no particular price, timing, or outcome is promised.</p><Link className="text-link" href="/about">Learn about this initiative <ArrowRight size={17} /></Link></div></div></section>
+    <section className="section about-strip"><div className="content-shell"><div className="about-mark" aria-hidden="true">K</div><div><p className="eyebrow">ABOUT SELL MY KERN HOME</p><h2>An independent, focused property-inquiry service.</h2><p>The site helps Kern County property owners organize basic facts and request a conversation. An inquiry does not create an agency, brokerage, purchase, or other contractual relationship, and no particular price, timing, or outcome is promised.</p><Link className="text-link" href="/about">Learn about this initiative <ArrowRight size={17} /></Link></div></div></section>
 
     <section className="section content-shell faq-preview"><div><p className="eyebrow">COMMON QUESTIONS</p><h2>Useful answers before you begin</h2></div><div>{faqs.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}<Link className="text-link" href="/faq">View all frequently asked questions <ArrowRight size={17} /></Link></div></section>
     <CTA />
