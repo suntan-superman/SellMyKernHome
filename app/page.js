@@ -18,7 +18,7 @@ const faqs = [
 export default function HomePage() {
   const form = getSellerFormConfiguration();
   const websiteSchema = { "@context": "https://schema.org", "@graph": [
-    { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: SITE_NAME, url: SITE_URL },
+    { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: SITE_NAME, url: SITE_URL, logo: `${SITE_URL}/icon.svg`, description: "An independent property inquiry service for Bakersfield and Kern County." },
     { "@type": "WebSite", "@id": `${SITE_URL}/#website`, name: SITE_NAME, url: SITE_URL, publisher: { "@id": `${SITE_URL}/#organization` }, inLanguage: "en-US" },
   ] };
   return <main id="main-content">

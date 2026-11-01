@@ -21,10 +21,16 @@ test("admin login provides an accessible password visibility control", () => {
 test("crawl controls keep production indexing behind an explicit release gate", () => {
   const layout = read("app/layout.js");
   const robots = read("app/robots.js");
+  const nextConfig = read("next.config.js");
   assert.match(layout, /robots: indexable \? \{ index: true, follow: true \} : \{ index: false, follow: true \}/);
   assert.match(robots, /allow: "\/"/);
   assert.match(robots, /sitemap: indexable \?/);
   assert.doesNotMatch(robots, /demo|staging/i);
+  for (const route of ["/admin/:path*", "/api/:path*", "/thank-you"]) {
+    assert.match(nextConfig, new RegExp(route.replace(/[/*]/g, "\\$&")));
+  }
+  assert.match(nextConfig, /X-Robots-Tag/);
+  assert.match(nextConfig, /noindex, nofollow, noarchive/);
 });
 test("canonical origin and sitemap are permanently domain-scoped", () => {
   assert.match(read("lib/site.js"), /https:\/\/sellmykernhome\.com/);
@@ -36,6 +42,15 @@ test("draft educational content cannot enter the sitemap", () => {
   const sitemap = read("app/sitemap.js");
   assert.match(articles, /approvedForIndexing: false/g);
   assert.match(sitemap, /filter\(\(article\) => article\.approvedForIndexing\)/);
+});
+test("reviewed seller landing pages are eligible only behind the master indexing gate", () => {
+  const pages = read("content/seller-pages.js");
+  const sitemap = read("app/sitemap.js");
+  assert.equal((pages.match(/approvedForIndexing: true/g) || []).length, 5);
+  assert.doesNotMatch(pages, /approvedForIndexing: false/);
+  assert.match(sitemap, /if \(!isIndexingEnabled\(\)\) return \[\]/);
+  assert.match(sitemap, /filter\(\(\[, page\]\) => page\.approvedForIndexing\)/);
+  assert.doesNotMatch(sitemap, /admin|api|thank-you/);
 });
 test("migration reasserts deny-by-default lead security", () => {
   const sql = read("supabase/migrations/20261014_sellmykernhome_leads.sql");
@@ -100,6 +115,10 @@ test("analytics requires consent, disables automatic page views, and omits query
   assert.match(analytics, /send_page_view: false/);
   assert.match(analytics, /analytics_storage: value === "granted"/);
   assert.match(analytics, /page_path: pathname/);
+  assert.match(analytics, /window\[`ga-disable-\$\{measurementId\}`\]/);
+  assert.match(analytics, /clearAnalyticsCookies/);
+  assert.match(analytics, /isExcludedPath/);
+  assert.match(analytics, /pathname === "\/admin" \|\| pathname\.startsWith\("\/admin\/"\)/);
   assert.doesNotMatch(analytics, /useSearchParams|window\.location\.search/);
 });
 
@@ -110,6 +129,8 @@ test("Netlify production builds fail closed on PI identity and launch gates", ()
   assert.match(verification, /Workside Software/);
   assert.match(verification, /SMKH_NOTIFICATIONS_ENABLED[^\n]+"false"/);
   assert.match(verification, /NEXT_PUBLIC_ROBOTS_INDEX[^\n]+"false"/);
+  assert.match(verification, /NEXT_PUBLIC_GA_MEASUREMENT_ID/);
+  assert.match(verification, /\^G-\[A-Z0-9\]\+\$/);
   assert.match(verification, /smkh_admin_memberships/);
   assert.doesNotMatch(verification, /console\.log\([^)]*(?:secretKey|publishableKey)/);
 });

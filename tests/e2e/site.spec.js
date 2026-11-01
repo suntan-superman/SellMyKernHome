@@ -20,6 +20,8 @@ test("homepage, navigation, and seller form are accessible", async ({ page }) =>
   await expect(continueButton).toBeEnabled();
   await continueButton.click();
   await expect(page.getByRole("heading", { name: "Add property details" })).toBeVisible();
+  expect(page.url()).not.toContain("Synthetic%20Seller");
+  expect(await page.title()).not.toContain("Synthetic Seller");
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
 });
@@ -47,6 +49,9 @@ test("indexing gate renders noindex while allowing crawlers to discover it", asy
   await page.goto("/");
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://sellmykernhome.com");
+  await page.goto("/sell-your-house-bakersfield");
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://sellmykernhome.com/sell-your-house-bakersfield");
   const robotsResponse = await request.get("/robots.txt");
   expect(robotsResponse.ok()).toBeTruthy();
   const robots = await robotsResponse.text();

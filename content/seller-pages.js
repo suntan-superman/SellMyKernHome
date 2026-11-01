@@ -1,6 +1,6 @@
 export const sellerPages = {
   "sell-your-house-bakersfield": {
-    approvedForIndexing: false,
+    approvedForIndexing: true,
     title: "Sell Your House in Bakersfield: Start by Comparing Your Options",
     metaTitle: "Sell Your House in Bakersfield | Compare Your Options",
     description: "A practical starting point for Bakersfield homeowners comparing how to sell, what to prepare, and which questions to ask before choosing a path.",
@@ -21,7 +21,7 @@ export const sellerPages = {
     ],
   },
   "sell-house-as-is-bakersfield": {
-    approvedForIndexing: false,
+    approvedForIndexing: true,
     title: "Selling a House As-Is in Bakersfield",
     metaTitle: "Sell a House As-Is in Bakersfield | What to Consider",
     description: "Understand condition, disclosure, repair, timing, and written-term considerations before selling a Bakersfield house as-is.",
@@ -42,7 +42,7 @@ export const sellerPages = {
     ],
   },
   "sell-inherited-house-bakersfield": {
-    approvedForIndexing: false,
+    approvedForIndexing: true,
     title: "Selling an Inherited House in Bakersfield",
     metaTitle: "Sell an Inherited House in Bakersfield | Questions to Organize",
     description: "Questions for Bakersfield and Kern County families to organize before deciding whether or how to sell an inherited property.",
@@ -63,7 +63,7 @@ export const sellerPages = {
     ],
   },
   "sell-house-needs-repairs-bakersfield": {
-    approvedForIndexing: false,
+    approvedForIndexing: true,
     title: "Selling a Bakersfield House That Needs Repairs",
     metaTitle: "Sell a House That Needs Repairs in Bakersfield | Options",
     description: "Organize repair facts, estimates, disclosures, and sale-path questions for a Bakersfield or Kern County house that needs work.",
@@ -84,7 +84,7 @@ export const sellerPages = {
     ],
   },
   "sell-rental-property-bakersfield": {
-    approvedForIndexing: false,
+    approvedForIndexing: true,
     title: "Selling a Rental Property in Bakersfield",
     metaTitle: "Sell a Rental Property in Bakersfield | Owner Checklist",
     description: "A checklist for Bakersfield rental owners considering occupancy, records, condition, timing, tenant rights, and sale options.",

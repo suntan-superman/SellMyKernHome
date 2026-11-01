@@ -30,6 +30,7 @@ const secretKey = requireValue("SUPABASE_SECRET_KEY");
 const siteUrl = requireValue("NEXT_PUBLIC_SITE_URL");
 const adminBaseUrl = requireValue("SMKH_ADMIN_BASE_URL");
 const notificationRecipient = requireValue("LEAD_NOTIFICATION_EMAIL");
+const gaMeasurementId = requireValue("NEXT_PUBLIC_GA_MEASUREMENT_ID");
 
 if (supabaseUrl !== expected.supabaseUrl) fail("the Supabase project URL is not PropertyIntelligence.");
 if (!publishableKey.startsWith("sb_publishable_")) fail("the Supabase publishable key format is invalid.");
@@ -39,6 +40,7 @@ if (adminBaseUrl !== expected.siteUrl) fail("SMKH_ADMIN_BASE_URL is not the prod
 if (process.env.SMKH_NOTIFICATIONS_ENABLED !== "false") fail("notifications must remain disabled.");
 if (process.env.NEXT_PUBLIC_ROBOTS_INDEX !== "false") fail("search indexing must remain disabled.");
 if (notificationRecipient.toLowerCase() !== expected.ownerEmail) fail("the notification recipient is not the Workside owner only.");
+if (!/^G-[A-Z0-9]+$/.test(gaMeasurementId)) fail("NEXT_PUBLIC_GA_MEASUREMENT_ID is not a valid GA4 measurement ID.");
 
 const activeGnzKeys = Object.entries(process.env)
   .filter(([key, value]) => key.includes("GNZ") && String(value ?? "").trim())

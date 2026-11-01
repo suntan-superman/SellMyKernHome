@@ -17,7 +17,13 @@ const nextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
   turbopack: { root: projectRoot },
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
+    const privateIndexingHeaders = [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }];
+    return [
+      { source: "/admin/:path*", headers: privateIndexingHeaders },
+      { source: "/api/:path*", headers: privateIndexingHeaders },
+      { source: "/thank-you", headers: privateIndexingHeaders },
+      { source: "/(.*)", headers: securityHeaders },
+    ];
   },
   async redirects() {
     return [
