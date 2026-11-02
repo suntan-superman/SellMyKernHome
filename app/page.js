@@ -7,7 +7,8 @@ import SituationGrid from "@/components/SituationGrid";
 import Process from "@/components/Process";
 import CTA from "@/components/CTA";
 import JsonLd from "@/components/JsonLd";
-import { SITE_NAME, SITE_URL } from "@/lib/site";
+import PhoneLink from "@/components/PhoneLink";
+import { BUSINESS_PHONE_DISPLAY, BUSINESS_PHONE_E164, BUSINESS_PHONE_SERVICE_LABEL, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const faqs = [
   ["What happens after I submit?", "We review the details you provide and contact you using your preferred method to learn more. Submitting is a request for a conversation, not a commitment to sell."],
@@ -18,13 +19,13 @@ const faqs = [
 export default function HomePage() {
   const form = getSellerFormConfiguration();
   const websiteSchema = { "@context": "https://schema.org", "@graph": [
-    { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: SITE_NAME, url: SITE_URL, logo: `${SITE_URL}/icon.svg`, description: "An independent property inquiry service for Bakersfield and Kern County." },
+    { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: SITE_NAME, url: SITE_URL, logo: `${SITE_URL}/icon.svg`, telephone: BUSINESS_PHONE_E164, contactPoint: { "@type": "ContactPoint", telephone: BUSINESS_PHONE_E164, contactType: "property inquiries", availableLanguage: "English" }, description: "An independent property inquiry service for Bakersfield and Kern County." },
     { "@type": "WebSite", "@id": `${SITE_URL}/#website`, name: SITE_NAME, url: SITE_URL, publisher: { "@id": `${SITE_URL}/#organization` }, inLanguage: "en-US" },
   ] };
   return <main id="main-content">
     <JsonLd data={websiteSchema} />
     <section className="hero">
-      <div className="hero-copy"><p className="eyebrow">BAKERSFIELD &amp; KERN COUNTY</p><h1>Thinking About Selling Your Kern County Home?</h1><p className="hero-subhead">Tell us about your property and what you&apos;re hoping to accomplish. We&apos;ll review the details and contact you to discuss possible next steps—without pressure.</p><div className="hero-trust"><span><ShieldCheck /> Private inquiry</span><span><MessageCircle /> Clear next steps</span><span><Handshake /> No obligation to submit</span></div></div>
+      <div className="hero-copy"><p className="eyebrow">BAKERSFIELD &amp; KERN COUNTY</p><h1>Thinking About Selling Your Kern County Home?</h1><p className="hero-subhead">Tell us about your property and what you&apos;re hoping to accomplish. We&apos;ll review the details and contact you to discuss possible next steps—without pressure.</p><PhoneLink className="button button-secondary hero-phone" location="homepage_hero" label={`Call Sell My Kern Home at ${BUSINESS_PHONE_DISPLAY}`}>Prefer to Talk? Call {BUSINESS_PHONE_DISPLAY}</PhoneLink><p className="hero-phone-note">{BUSINESS_PHONE_SERVICE_LABEL}.</p><div className="hero-trust"><span><ShieldCheck /> Private inquiry</span><span><MessageCircle /> Clear next steps</span><span><Handshake /> No obligation to submit</span></div></div>
       <div className="hero-visual"><Image src="/images/modern-home-exterior.jpg" alt="Contemporary home with clean lines and a landscaped front entry" fill priority sizes="(max-width: 900px) 100vw, 52vw" /><span className="image-caption"><MapPin size={15} /> Serving Bakersfield &amp; Kern County</span></div>
       <div className="hero-form-wrap"><PropertyForm compact {...form} /></div>
     </section>

@@ -4,7 +4,9 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, LoaderCircle, LockKeyhole } from "lucide-react";
 import { track } from "@/lib/analytics";
+import { BUSINESS_PHONE_DISPLAY, BUSINESS_PHONE_SERVICE_LABEL } from "@/lib/site";
 import { formatPhoneNumber } from "@/lib/validation";
+import PhoneLink from "./PhoneLink";
 import TurnstileWidget from "./TurnstileWidget";
 
 const empty = {
@@ -113,6 +115,7 @@ export default function PropertyForm({ compact = false, initialAddress = "", tur
   return <form id="property-form" className={`property-form ${compact ? "form-compact" : ""}`} onSubmit={submit} noValidate>
     <div className="form-heading"><div><span className="form-step">Step {step} of 2</span><h2>{step === 1 ? "Tell us where to start" : "Add property details"}</h2></div><span className="secure-note"><LockKeyhole size={16} /> Private inquiry</span></div>
     <div className="progress" aria-hidden="true"><span style={{ width: step === 1 ? "50%" : "100%" }} /></div>
+    {!compact && step === 1 ? <div className="form-call-option"><span>Prefer to talk?</span><PhoneLink location="contact_form" label={`Call Sell My Kern Home at ${BUSINESS_PHONE_DISPLAY}`}>Call {BUSINESS_PHONE_DISPLAY}</PhoneLink><small>{BUSINESS_PHONE_SERVICE_LABEL}.</small></div> : null}
     {step === 1 ? <div className="form-fields">
       <div className="field-wide"><label htmlFor="propertyAddress">Property street address</label><input id="propertyAddress" name="propertyAddress" autoComplete="street-address" value={data.propertyAddress} onChange={update} aria-invalid={Boolean(errors.propertyAddress)} aria-describedby={describedBy("propertyAddress")} placeholder="123 Oak Street" />{fieldError("propertyAddress")}</div>
       <div><label htmlFor="propertyCity">City</label><input id="propertyCity" name="propertyCity" autoComplete="address-level2" value={data.propertyCity} onChange={update} aria-invalid={Boolean(errors.propertyCity)} aria-describedby={describedBy("propertyCity")} placeholder="Bakersfield" />{fieldError("propertyCity")}</div>
