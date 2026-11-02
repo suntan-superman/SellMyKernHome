@@ -40,7 +40,9 @@ test("analytics waits for consent, sends one explicit page view, and supports wi
   expect(firstPageView[2].page_location).toBe("http://127.0.0.1:3000/");
   expect(firstPageView[2].page_location).not.toContain("?");
 
-  await page.getByRole("navigation", { name: "Primary navigation" }).getByRole("link", { name: "How It Works" }).click();
+  const primaryNavigation = page.getByRole("navigation", { name: "Primary navigation" });
+  if (!(await primaryNavigation.isVisible())) await page.getByRole("button", { name: "Open menu" }).click();
+  await primaryNavigation.getByRole("link", { name: "How It Works" }).click();
   await expect(page).toHaveURL(/\/how-it-works$/);
   await expect.poll(async () => {
     const current = await dataLayerEntries(page);

@@ -14,13 +14,21 @@ export const situations = [
     points: ["Current lease terms and security-deposit records", "Required notices and tenant rights", "Property condition and maintenance history", "Your preferred timing and tax questions for a professional"],
     note: "Landlord-tenant and tax rules can be situation-specific. Consult qualified California professionals before taking action." },
   { slug: "vacant-property", href: "/selling-situations/vacant-property", title: "Vacant home", short: "Review security, upkeep, condition, and your desired timeline.", icon: MapPinned,
+    pageTitle: "Selling a Vacant Home in Bakersfield or Kern County",
+    metaTitle: "Sell a Vacant House in Bakersfield",
+    metaDescription: "Organize security, insurance, maintenance, access, condition, and timing questions before deciding how to sell a vacant Bakersfield or Kern County home.",
     intro: "A vacant home still needs attention. Insurance, maintenance, utilities, security, and travel can all shape what a practical next step looks like.",
     points: ["Current insurance and utility status", "Security, yard care, and periodic property checks", "Known damage or deferred maintenance", "Access arrangements for any future inspection or walkthrough"],
-    note: "Avoid sharing access codes, keys, or sensitive security details through this website." },
+    note: "Avoid sharing access codes, keys, or sensitive security details through this website.",
+    related: [["/sell-house-needs-repairs-bakersfield", "Organize repair and condition questions"], ["/sell-house-as-is-bakersfield", "Review as-is sale considerations"], ["/how-it-works", "See how a private inquiry works"]] },
   { slug: "relocating", href: "/selling-situations/relocating", title: "Relocating", short: "Plan around your move, property readiness, and decision timeline.", icon: Truck,
+    pageTitle: "Selling a Bakersfield Home When Relocating",
+    metaTitle: "Sell a Bakersfield Home When Relocating",
+    metaDescription: "Plan a Bakersfield or Kern County home sale around relocation dates, occupancy, property readiness, documents, and flexible next steps.",
     intro: "A move for work, family, or a new chapter can create competing deadlines. Your property plan should start with the dates you know and the flexibility you need.",
     points: ["Your move date and whether the home will become vacant", "Repairs or packing that may affect readiness", "Documents and decision-makers who need to be available", "A backup plan if your preferred timing changes"],
-    note: "Timelines depend on the property, transaction path, and third parties. We do not promise a closing date before reviewing the details." },
+    note: "Timelines depend on the property, transaction path, and third parties. We do not promise a closing date before reviewing the details.",
+    related: [["/sell-your-house-bakersfield", "Compare Bakersfield home-selling paths"], ["/selling-situations/vacant-property", "Plan for a home that may become vacant"], ["/contact", "Share your property priorities privately"]] },
 ];
 
 export function getSituation(slug) { return situations.find((item) => item.slug === slug); }

@@ -1,5 +1,7 @@
 import PageHero from "@/components/PageHero";
 import CTA from "@/components/CTA";
+import JsonLd from "@/components/JsonLd";
+import RelatedResources from "@/components/RelatedResources";
 import { buildPageMetadata } from "@/lib/site";
 
 const faqs = [
@@ -15,6 +17,9 @@ const faqs = [
   ["Can I get independent advice?", "Yes. You may consult an attorney, tax professional, licensed real-estate professional, contractor, or other independent adviser before making a decision."],
 ];
 
-export const metadata = buildPageMetadata({ title: "Frequently Asked Questions", description: "Answers about Sell My Kern Home inquiries, privacy boundaries, property details, and next steps.", path: "/faq" });
-export default function FAQPage() { return <main id="main-content"><PageHero eyebrow="FREQUENTLY ASKED QUESTIONS" title="Clear answers before you share property details" intro="These responses explain the inquiry process and the boundaries of the information on this site." breadcrumbs={[{ label: "FAQ" }]} /><section className="section content-shell faq-preview"><div><h2>Questions from property owners</h2></div><div>{faqs.map(([q,a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}</div></section><CTA /></main>; }
+export const metadata = buildPageMetadata({ title: "Bakersfield Home Seller Questions", description: "Answers for Bakersfield and Kern County property owners about inquiries, repairs, privacy, professional roles, fees, and possible next steps.", path: "/faq" });
+export default function FAQPage() {
+  const schema = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map(([question, answer]) => ({ "@type": "Question", name: question, acceptedAnswer: { "@type": "Answer", text: answer } })) };
+  return <main id="main-content"><JsonLd data={schema} /><PageHero eyebrow="FREQUENTLY ASKED QUESTIONS" title="Clear answers before you share property details" intro="These responses explain the inquiry process and the boundaries of the information on this site." breadcrumbs={[{ label: "FAQ" }]} /><section className="section content-shell faq-preview"><div><h2>Questions from property owners</h2></div><div>{faqs.map(([q,a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}</div></section><RelatedResources title="Explore the next step" links={[["/how-it-works", "See how the inquiry process works"], ["/sell-your-house-bakersfield", "Compare Bakersfield home-selling options"], ["/contact", "Share your property details privately"]]} /><CTA /></main>;
+}
 

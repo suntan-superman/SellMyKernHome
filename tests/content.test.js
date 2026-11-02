@@ -47,10 +47,41 @@ test("reviewed seller landing pages are eligible only behind the master indexing
   const pages = read("content/seller-pages.js");
   const sitemap = read("app/sitemap.js");
   assert.equal((pages.match(/approvedForIndexing: true/g) || []).length, 5);
+  const sellerTitles = [...pages.matchAll(/metaTitle: "([^"]+)"/g)].map((match) => match[1]);
+  assert.equal(sellerTitles.length, 5);
+  for (const title of sellerTitles) assert.ok(title.length <= 42, `${title} is too long before the site-name suffix`);
   assert.doesNotMatch(pages, /approvedForIndexing: false/);
   assert.match(sitemap, /if \(!isIndexingEnabled\(\)\) return \[\]/);
   assert.match(sitemap, /filter\(\(\[, page\]\) => page\.approvedForIndexing\)/);
   assert.doesNotMatch(sitemap, /admin|api|thank-you/);
+});
+test("indexed pages use contextual links and do not promote draft article URLs", () => {
+  const related = read("components/RelatedResources.js");
+  const sellerPages = read("content/seller-pages.js");
+  assert.match(related, /import Link from "next\/link"/);
+  assert.match(related, /className="related-links"/);
+  for (const route of ["app/how-it-works/page.js", "app/about/page.js", "app/faq/page.js", "app/contact/page.js", "app/insights/page.js"]) {
+    assert.match(read(route), /<RelatedResources/);
+  }
+  assert.doesNotMatch(sellerPages, /\/insights\//);
+});
+test("situation aliases do not create duplicate indexable pages", () => {
+  const route = read("app/selling-situations/[slug]/page.js");
+  assert.match(route, /export const dynamicParams = false/);
+  assert.match(route, /situations\.filter\(isDedicatedSituationPage\)/);
+  assert.match(route, /if \(!isDedicatedSituationPage\(item\)\) notFound\(\)/);
+});
+test("FAQ schema mirrors visible questions and seller guides cite public authorities", () => {
+  const faq = read("app/faq/page.js");
+  const seller = read("components/SellerLandingPage.js");
+  const pages = read("content/seller-pages.js");
+  assert.match(faq, /"@type": "FAQPage"/);
+  assert.match(faq, /mainEntity: faqs\.map/);
+  assert.match(seller, /Authoritative public resources/);
+  assert.match(seller, /target="_blank" rel="noreferrer"/);
+  assert.match(pages, /https:\/\/www\.dre\.ca\.gov\//);
+  assert.match(pages, /https:\/\/selfhelp\.courts\.ca\.gov\/probate/);
+  assert.match(pages, /https:\/\/www\.kern\.courts\.ca\.gov\/divisions\/probate/);
 });
 test("migration reasserts deny-by-default lead security", () => {
   const sql = read("supabase/migrations/20261014_sellmykernhome_leads.sql");
