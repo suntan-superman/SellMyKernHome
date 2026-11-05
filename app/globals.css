@@ -854,6 +854,67 @@ summary:focus-visible {
   margin-bottom: 0;
   font-size: 0.9rem;
 }
+.seller-comparison {
+  overflow: hidden;
+}
+.comparison-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--white);
+}
+.comparison-table-wrap:focus-visible {
+  outline: 3px solid var(--gold);
+  outline-offset: 3px;
+}
+.comparison-table-wrap table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  text-align: left;
+}
+.comparison-table-wrap th,
+.comparison-table-wrap td {
+  padding: 20px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+.comparison-table-wrap tr > :last-child {
+  border-right: 0;
+}
+.comparison-table-wrap tbody tr:last-child > * {
+  border-bottom: 0;
+}
+.comparison-table-wrap thead th {
+  background: var(--forest);
+  color: var(--white);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+}
+.comparison-table-wrap tbody th {
+  width: 22%;
+  color: var(--forest);
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+}
+.comparison-table-wrap td {
+  width: 39%;
+  font-size: 0.9rem;
+}
+.comparison-note,
+.comparison-boundary {
+  max-width: 880px;
+}
+.comparison-note {
+  margin-top: 24px;
+  color: var(--ink);
+  font-weight: 700;
+}
+.comparison-boundary {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
 .related-links,
 .source-links {
   padding-left: 0;

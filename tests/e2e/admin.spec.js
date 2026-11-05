@@ -4,7 +4,7 @@ test("SMKH Admin requires authentication and records the verified operator", asy
   await page.goto("/admin");
   await expect(page).toHaveURL(/\/admin\/login/);
   await page.getByLabel("Email address").fill("admin@example.test");
-  await page.getByLabel("Password").fill("synthetic-admin-password");
+  await page.getByRole("textbox", { name: "Password" }).fill("synthetic-admin-password");
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/admin$/);
   await expect(page.getByRole("heading", { name: "Seller leads" })).toBeVisible();
@@ -21,7 +21,7 @@ test("SMKH Admin requires authentication and records the verified operator", asy
 test("protected PI demonstration uses synthetic property data only", async ({ page }) => {
   await page.goto("/admin/login");
   await page.getByLabel("Email address").fill("admin@example.test");
-  await page.getByLabel("Password").fill("synthetic-admin-password");
+  await page.getByRole("textbox", { name: "Password" }).fill("synthetic-admin-password");
   await page.getByRole("button", { name: "Sign in" }).click();
   await page.goto("/admin/property-intelligence");
   await expect(page.getByRole("heading", { name: "Synthetic Kern County property evaluation" })).toBeVisible();

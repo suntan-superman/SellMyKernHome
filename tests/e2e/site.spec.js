@@ -47,6 +47,19 @@ test("required routes return useful pages", async ({ page }) => {
   }
 });
 
+test("Bakersfield selling-path comparison is readable and accessible", async ({ page }) => {
+  await page.goto("/sell-your-house-bakersfield");
+  await expect(page).toHaveTitle(/Sell Your House in Bakersfield/);
+  const comparison = page.getByRole("region", { name: "Home-selling path comparison" });
+  await expect(comparison).toBeVisible();
+  await expect(comparison.getByRole("columnheader", { name: "Traditional market listing" })).toBeVisible();
+  await expect(comparison.getByRole("columnheader", { name: "Direct or cash proposal" })).toBeVisible();
+  await expect(comparison.getByRole("rowheader", { name: "Price and net proceeds" })).toBeVisible();
+  const results = await new AxeBuilder({ page }).include(".seller-comparison").withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  const blocking = results.violations.filter((item) => ["serious", "critical"].includes(item.impact));
+  expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([]);
+});
+
 test("superseded situation aliases redirect to canonical seller pages", async ({ request }) => {
   const aliases = new Map([
     ["/selling-situations/inherited-property", "/sell-inherited-house-bakersfield"],

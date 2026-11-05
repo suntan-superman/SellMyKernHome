@@ -15,7 +15,7 @@ export const situations = [
     note: "Landlord-tenant and tax rules can be situation-specific. Consult qualified California professionals before taking action." },
   { slug: "vacant-property", href: "/selling-situations/vacant-property", title: "Vacant home", short: "Review security, upkeep, condition, and your desired timeline.", icon: MapPinned,
     pageTitle: "Selling a Vacant Home in Bakersfield or Kern County",
-    metaTitle: "Sell a Vacant House in Bakersfield",
+    metaTitle: "Sell a Vacant Home in Kern County",
     metaDescription: "Organize security, insurance, maintenance, access, condition, and timing questions before deciding how to sell a vacant Bakersfield or Kern County home.",
     intro: "A vacant home still needs attention. Insurance, maintenance, utilities, security, and travel can all shape what a practical next step looks like.",
     points: ["Current insurance and utility status", "Security, yard care, and periodic property checks", "Known damage or deferred maintenance", "Access arrangements for any future inspection or walkthrough"],

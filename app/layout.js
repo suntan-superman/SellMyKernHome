@@ -12,7 +12,7 @@ const indexable = isIndexingEnabled();
 
 export const metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: "Sell My Kern Home | A Thoughtful Way to Discuss Your Property", template: "%s | Sell My Kern Home" },
+  title: { default: "Sell Your House in Bakersfield & Kern County | Sell My Kern Home", template: "%s | Sell My Kern Home" },
   description: SITE_DESCRIPTION,
   verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } : undefined,
   alternates: { canonical: "/" },
@@ -22,11 +22,11 @@ export const metadata = {
     locale: "en_US",
     siteName: SITE_NAME,
     url: SITE_URL,
-    title: "Thinking About Selling Your Kern County Home?",
+    title: "Selling a Home in Bakersfield or Kern County?",
     description: "Tell us about your property and what you hope to accomplish. We’ll review the details and contact you to discuss possible next steps.",
     images: [{ url: "/images/modern-home-exterior.jpg", width: 1920, height: 1280, alt: "Contemporary home with clean lines and a landscaped front entry" }],
   },
-  twitter: { card: "summary_large_image", title: "Thinking About Selling Your Kern County Home?", description: SITE_DESCRIPTION, images: ["/images/modern-home-exterior.jpg"] },
+  twitter: { card: "summary_large_image", title: "Selling a Home in Bakersfield or Kern County?", description: SITE_DESCRIPTION, images: ["/images/modern-home-exterior.jpg"] },
 };
 
 export default function RootLayout({ children }) {

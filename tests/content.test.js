@@ -65,6 +65,24 @@ test("indexed pages use contextual links and do not promote draft article URLs",
   }
   assert.doesNotMatch(sellerPages, /\/insights\//);
 });
+test("Bakersfield option comparison is substantive and preserves claim boundaries", () => {
+  const pages = read("content/seller-pages.js");
+  const component = read("components/SellerLandingPage.js");
+  assert.match(pages, /Traditional market listing/);
+  assert.match(pages, /Direct or cash proposal/);
+  for (const factor of ["Price and net proceeds", "Preparation and access", "Contingencies and certainty", "Timing and possession", "Professional roles"]) assert.match(pages, new RegExp(factor));
+  assert.match(component, /<table>/);
+  assert.match(component, /scope="col"/);
+  assert.match(component, /scope="row"/);
+  assert.match(component, /does not state that SMKH is a cash buyer/);
+  assert.doesNotMatch(pages, /close in (?:as little as )?\d|offer (?:today|within \d)|no (?:fees|commissions|closing costs)/i);
+});
+test("public role disclosures describe the approved service without implying a transaction role", () => {
+  const publicCopy = `${read("app/page.js")}\n${read("app/about/page.js")}\n${read("components/SellerLandingPage.js")}`;
+  assert.match(publicCopy, /seller-inquiry and property-opportunity service/);
+  assert.match(publicCopy, /does not represent through this website that it is a licensed brokerage, guaranteed cash buyer, or contracting party/);
+  assert.match(publicCopy, /does not state that SMKH is a cash buyer, brokerage, attorney, tax adviser, or contracting party/);
+});
 test("situation aliases do not create duplicate indexable pages", () => {
   const route = read("app/selling-situations/[slug]/page.js");
   assert.match(route, /export const dynamicParams = false/);
