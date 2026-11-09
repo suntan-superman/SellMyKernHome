@@ -83,6 +83,18 @@ test("public role disclosures describe the approved service without implying a t
   assert.match(publicCopy, /does not represent through this website that it is a licensed brokerage, guaranteed cash buyer, or contracting party/);
   assert.match(publicCopy, /does not state that SMKH is a cash buyer, brokerage, attorney, tax adviser, or contracting party/);
 });
+test("homepage uses the approved homeowner brand message and preserves local conversion paths", () => {
+  const homepage = read("app/page.js");
+  assert.match(homepage, /<h1>Your Home\. Your Options\. Your Decision\.<\/h1>/);
+  assert.equal((homepage.match(/<h1>/g) || []).length, 1);
+  assert.match(homepage, /selling a house in Bakersfield or Kern County/);
+  assert.match(homepage, /Tell Us About Your Property/);
+  assert.match(homepage, /href="#property-form"/);
+  assert.match(homepage, /No obligation to sell\./);
+  assert.match(homepage, /Call anytime — \{BUSINESS_PHONE_SERVICE_LABEL\}\./);
+  assert.match(homepage, /data-analytics-event="primary_cta_click"/);
+  assert.match(homepage, /data-analytics-location="homepage_hero"/);
+});
 test("situation aliases do not create duplicate indexable pages", () => {
   const route = read("app/selling-situations/[slug]/page.js");
   assert.match(route, /export const dynamicParams = false/);

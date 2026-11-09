@@ -4,7 +4,12 @@ import path from "node:path";
 
 test("homepage, navigation, and seller form are accessible", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("Thinking About Selling");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Your Home. Your Options. Your Decision.");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveCount(1);
+  const heroCta = page.locator('[data-analytics-event="primary_cta_click"][data-analytics-location="homepage_hero"]');
+  await expect(heroCta).toHaveAccessibleName("Tell Us About Your Property");
+  await expect(heroCta).toHaveAttribute("href", "#property-form");
+  await expect(page.getByText("No obligation to sell.", { exact: true })).toBeVisible();
   await expect(page.getByLabel("Property street address")).toBeVisible();
   const continueButton = page.getByRole("button", { name: "Continue" });
   await expect(continueButton).toBeDisabled();

@@ -245,6 +245,13 @@ summary:focus-visible {
   max-width: 650px;
   font-size: 1.08rem;
 }
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
 .hero-trust {
   display: flex;
   flex-wrap: wrap;
@@ -254,7 +261,7 @@ summary:focus-visible {
   font-weight: 700;
 }
 .hero-phone {
-  margin-top: 12px;
+  margin-top: 0;
   padding: 11px 18px;
 }
 .hero-phone-note {
