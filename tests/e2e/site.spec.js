@@ -10,6 +10,9 @@ test("homepage, navigation, and seller form are accessible", async ({ page }) =>
   await expect(heroCta).toHaveAccessibleName("Tell Us About Your Property");
   await expect(heroCta).toHaveAttribute("href", "#property-form");
   await expect(page.getByText("No obligation to sell.", { exact: true })).toBeVisible();
+  const heroImage = page.locator('.hero-visual img[src*="craftsman-home-exterior-v2"]');
+  await expect(heroImage).toBeVisible();
+  await expect.poll(() => heroImage.evaluate((image) => image.complete && image.naturalWidth > 0)).toBe(true);
   await expect(page.getByLabel("Property street address")).toBeVisible();
   const continueButton = page.getByRole("button", { name: "Continue" });
   await expect(continueButton).toBeDisabled();

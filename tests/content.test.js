@@ -95,6 +95,15 @@ test("homepage uses the approved homeowner brand message and preserves local con
   assert.match(homepage, /data-analytics-event="primary_cta_click"/);
   assert.match(homepage, /data-analytics-location="homepage_hero"/);
 });
+test("homepage and social metadata use the optimized Craftsman hero image", () => {
+  const homepage = read("app/page.js");
+  const site = read("lib/site.js");
+  const imagePath = "public/images/craftsman-home-exterior-v2.webp";
+  assert.equal(fs.existsSync(path.join(root, imagePath)), true, imagePath);
+  assert.match(homepage, /src="\/images\/craftsman-home-exterior-v2\.webp"/);
+  assert.match(homepage, /alt="Blue-gray Craftsman-style home with a welcoming lit porch and landscaped front walk"/);
+  assert.match(site, /url: "\/images\/craftsman-home-exterior-v2\.webp", width: 1536, height: 1024/);
+});
 test("situation aliases do not create duplicate indexable pages", () => {
   const route = read("app/selling-situations/[slug]/page.js");
   assert.match(route, /export const dynamicParams = false/);
