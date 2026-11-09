@@ -24,9 +24,9 @@ export const metadata = {
     url: SITE_URL,
     title: "Selling a Home in Bakersfield or Kern County?",
     description: "Tell us about your property and what you hope to accomplish. We’ll review the details and contact you to discuss possible next steps.",
-    images: [{ url: "/images/modern-home-exterior.jpg", width: 1920, height: 1280, alt: "Contemporary home with clean lines and a landscaped front entry" }],
+    images: [{ url: "/images/craftsman-home-exterior-v2.webp", width: 1536, height: 1024, alt: "Blue-gray Craftsman-style home with a welcoming lit porch and landscaped front walk" }],
   },
-  twitter: { card: "summary_large_image", title: "Selling a Home in Bakersfield or Kern County?", description: SITE_DESCRIPTION, images: ["/images/modern-home-exterior.jpg"] },
+  twitter: { card: "summary_large_image", title: "Selling a Home in Bakersfield or Kern County?", description: SITE_DESCRIPTION, images: ["/images/craftsman-home-exterior-v2.webp"] },
 };
 
 export default function RootLayout({ children }) {
