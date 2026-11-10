@@ -180,6 +180,11 @@ test("homepage uses the approved homeowner brand message and preserves local con
   assert.match(homepage, /Call anytime — \{BUSINESS_PHONE_SERVICE_LABEL\}\./);
   assert.match(homepage, /data-analytics-event="primary_cta_click"/);
   assert.match(homepage, /data-analytics-location="homepage_hero"/);
+  assert.match(homepage, /Use the Free Net Proceeds Calculator/);
+  assert.match(homepage, /href="\/tools\/home-sale-net-proceeds-calculator"/);
+  assert.match(homepage, /data-analytics-event="calculator_cta_click"/);
+  const header = read("components/Header.js");
+  assert.match(header, /\["\/tools\/home-sale-net-proceeds-calculator", "Calculator"\]/);
 });
 test("homepage and social metadata use the optimized Craftsman hero image", () => {
   const homepage = read("app/page.js");

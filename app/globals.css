@@ -269,6 +269,12 @@ summary:focus-visible {
   color: var(--body);
   font-size: 0.73rem;
 }
+.hero-tool-link {
+  margin: 13px 0 0;
+}
+.hero-tool-link .text-link {
+  font-size: 0.82rem;
+}
 .hero-trust span {
   display: flex;
   align-items: center;

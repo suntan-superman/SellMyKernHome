@@ -9,6 +9,10 @@ test("homepage, navigation, and seller form are accessible", async ({ page }) =>
   const heroCta = page.locator('[data-analytics-event="primary_cta_click"][data-analytics-location="homepage_hero"]');
   await expect(heroCta).toHaveAccessibleName("Tell Us About Your Property");
   await expect(heroCta).toHaveAttribute("href", "#property-form");
+  const calculatorCta = page.getByRole("link", { name: "Use the Free Net Proceeds Calculator" });
+  await expect(calculatorCta).toBeVisible();
+  await expect(calculatorCta).toHaveAttribute("href", "/tools/home-sale-net-proceeds-calculator");
+  await expect(page.locator('#primary-navigation a[href="/tools/home-sale-net-proceeds-calculator"]')).toHaveText("Calculator");
   await expect(page.getByText("No obligation to sell.", { exact: true })).toBeVisible();
   const heroImage = page.locator('.hero-visual img[src*="craftsman-home-exterior-v2"]');
   await expect(heroImage).toBeVisible();
