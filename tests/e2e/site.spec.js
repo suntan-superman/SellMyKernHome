@@ -55,8 +55,19 @@ test("required public routes return useful pages", async ({ page }) => {
   }
 });
 
-test("unapproved insight drafts are not publicly accessible or linked", async ({ page, request }) => {
-  const drafts = ["selling-a-house-as-is-bakersfield", "selling-inherited-property-kern-county", "options-when-house-needs-major-repairs", "questions-before-signing-property-purchase-agreement"];
+test("the approved as-is article is public while the other drafts remain inaccessible", async ({ page, request }) => {
+  const approved = "sell-as-is-or-repair-bakersfield";
+  const drafts = ["selling-inherited-property-kern-county", "options-when-house-needs-major-repairs", "questions-before-signing-property-purchase-agreement"];
+  await page.goto("/insights");
+  await expect(page.locator(`a[href="/insights/${approved}"]`)).toBeVisible();
+  const articleResponse = await page.goto(`/insights/${approved}`);
+  expect(articleResponse.ok()).toBeTruthy();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Sell As-Is or Make Repairs? A Bakersfield Homeowner's Guide");
+  await expect(page.getByRole("region", { name: "Hypothetical net-proceeds comparison" })).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", `https://sellmykernhome.com/insights/${approved}`);
+  await expect(page.locator("h1")).toHaveCount(1);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
   await page.goto("/insights");
   for (const slug of drafts) {
     await expect(page.locator(`a[href="/insights/${slug}"]`)).toHaveCount(0);

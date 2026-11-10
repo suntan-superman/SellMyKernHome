@@ -39,17 +39,33 @@ test("canonical origin and sitemap are permanently domain-scoped", () => {
   assert.match(read("app/sitemap.js"), /if \(!isIndexingEnabled\(\)\) return \[\]/);
   assert.match(read("next.config.js"), /sellmykernhome\.netlify\.app/);
 });
-test("draft educational content cannot enter the sitemap", () => {
+test("only the approved as-is article can enter the sitemap", () => {
   const articles = read("content/articles.js");
   const sitemap = read("app/sitemap.js");
   const index = read("app/insights/page.js");
   const route = read("app/insights/[slug]/page.js");
-  assert.match(articles, /approvedForIndexing: false/g);
+  assert.equal((articles.match(/approvedForIndexing: true/g) || []).length, 1);
+  assert.equal((articles.match(/approvedForIndexing: false/g) || []).length, 3);
+  assert.match(articles, /slug: "sell-as-is-or-repair-bakersfield"[\s\S]*?approvedForIndexing: true/);
   assert.match(sitemap, /filter\(\(article\) => article\.approvedForIndexing\)/);
-  assert.doesNotMatch(index, /articles\.map|\/insights\/\$\{article\.slug\}/);
+  assert.match(index, /\/insights\/sell-as-is-or-repair-bakersfield/);
   assert.match(route, /export const dynamicParams = false/);
   assert.match(route, /articles\.filter\(\(article\) => article\.approvedForIndexing\)/);
   assert.match(route, /if \(!article\?\.approvedForIndexing\) notFound\(\)/);
+});
+test("approved as-is article includes the authorized comparison, guidance, and role boundaries", () => {
+  const articles = read("content/articles.js");
+  const route = read("app/insights/[slug]/page.js");
+  for (const value of ["$320,000", "$275,000", "$25,000", "$19,200", "$5,500", "$3,000", "$1,000", "$272,800", "$268,500"]) assert.match(articles, new RegExp(value.replace("$", "\\$")));
+  assert.match(articles, /hypothetical examples for comparison only/i);
+  assert.match(articles, /Selling expenses and real-estate commissions are negotiable/i);
+  assert.match(articles, /does not automatically eliminate disclosures/i);
+  for (const topic of ["qualifications", "contingencies", "assignment", "closing terms"]) assert.match(articles, new RegExp(topic, "i"));
+  for (const href of ["/sell-house-as-is-bakersfield", "/sell-your-house-bakersfield", "/contact"]) assert.match(articles, new RegExp(href));
+  assert.match(articles, /https:\/\/www\.dre\.ca\.gov\/files\/pdf\/re6\.pdf/);
+  assert.match(route, /"@type": "Article"/);
+  assert.match(route, /SHORT_DISCLOSURE_TEXT/);
+  assert.match(route, /metadata\.title = \{ absolute: article\.metaTitle \}/);
 });
 test("reviewed seller landing pages are eligible only behind the master indexing gate", () => {
   const pages = read("content/seller-pages.js");
@@ -71,7 +87,9 @@ test("indexed pages use contextual links and do not promote draft article URLs",
   for (const route of ["app/how-it-works/page.js", "app/about/page.js", "app/faq/page.js", "app/contact/page.js", "app/insights/page.js"]) {
     assert.match(read(route), /<RelatedResources/);
   }
-  assert.doesNotMatch(sellerPages, /\/insights\//);
+  assert.equal((sellerPages.match(/\/insights\//g) || []).length, 1);
+  assert.match(sellerPages, /\/insights\/sell-as-is-or-repair-bakersfield/);
+  for (const draft of ["selling-inherited-property-kern-county", "options-when-house-needs-major-repairs", "questions-before-signing-property-purchase-agreement"]) assert.doesNotMatch(sellerPages, new RegExp(draft));
 });
 test("Bakersfield option comparison is substantive and preserves claim boundaries", () => {
   const pages = read("content/seller-pages.js");
