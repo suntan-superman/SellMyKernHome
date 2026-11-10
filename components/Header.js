@@ -9,7 +9,7 @@ import { BUSINESS_PHONE_DISPLAY } from "@/lib/site";
 
 const links = [
   ["/", "Home"], ["/how-it-works", "How It Works"], ["/selling-situations", "Selling Situations"],
-  ["/tools/home-sale-net-proceeds-calculator", "Calculator"], ["/about", "About"], ["/faq", "FAQ"], ["/contact", "Contact"],
+  ["/insights", "Insights"], ["/tools/home-sale-net-proceeds-calculator", "Calculator"], ["/about", "About"], ["/faq", "FAQ"], ["/contact", "Contact"],
 ];
 
 export default function Header() {

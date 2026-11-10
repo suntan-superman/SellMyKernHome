@@ -13,6 +13,11 @@ test("homepage, navigation, and seller form are accessible", async ({ page }) =>
   await expect(calculatorCta).toBeVisible();
   await expect(calculatorCta).toHaveAttribute("href", "/tools/home-sale-net-proceeds-calculator");
   await expect(page.locator('#primary-navigation a[href="/tools/home-sale-net-proceeds-calculator"]')).toHaveText("Calculator");
+  await expect(page.locator('#primary-navigation a[href="/insights"]')).toHaveText("Insights");
+  const latestGuide = page.getByRole("link", { name: "Sell As-Is or Make Repairs? A Bakersfield Homeowner's Guide" }).first();
+  await expect(latestGuide).toBeVisible();
+  await expect(latestGuide).toHaveAttribute("href", "/insights/sell-as-is-or-repair-bakersfield");
+  await expect(page.getByRole("link", { name: "View all homeowner guides" })).toHaveAttribute("href", "/insights");
   await expect(page.getByText("No obligation to sell.", { exact: true })).toBeVisible();
   const heroImage = page.locator('.hero-visual img[src*="craftsman-home-exterior-v2"]');
   await expect(heroImage).toBeVisible();
@@ -34,6 +39,20 @@ test("homepage, navigation, and seller form are accessible", async ({ page }) =>
   await expect(page.getByRole("heading", { name: "Add property details" })).toBeVisible();
   expect(page.url()).not.toContain("Synthetic%20Seller");
   expect(await page.title()).not.toContain("Synthetic Seller");
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+});
+
+test("expanded primary navigation fits before the mobile breakpoint", async ({ page }) => {
+  await page.setViewportSize({ width: 900, height: 900 });
+  await page.goto("/");
+  const navigation = page.locator("#primary-navigation");
+  await expect(navigation).toBeVisible();
+  await expect(navigation.getByRole("link", { name: "Insights", exact: true })).toBeVisible();
+  const [navigationBox, shellBox, logoBox, actionsBox] = await Promise.all([navigation.boundingBox(), page.locator(".nav-shell").boundingBox(), page.locator(".site-header .logo").boundingBox(), page.locator(".header-actions").boundingBox()]);
+  expect(navigationBox.x).toBeGreaterThanOrEqual(shellBox.x);
+  expect(navigationBox.x + navigationBox.width).toBeLessThanOrEqual(shellBox.x + shellBox.width + 1);
+  expect(logoBox.x + logoBox.width).toBeLessThanOrEqual(actionsBox.x);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
 });
