@@ -38,6 +38,8 @@ if (!secretKey.startsWith("sb_secret_")) fail("the server-only Supabase secret k
 if (siteUrl !== expected.siteUrl) fail("NEXT_PUBLIC_SITE_URL is not the production domain.");
 if (adminBaseUrl !== expected.siteUrl) fail("SMKH_ADMIN_BASE_URL is not the production domain.");
 if (process.env.SMKH_NOTIFICATIONS_ENABLED !== "false") fail("notifications must remain disabled.");
+if ((process.env.SMKH_PARTNER_DELIVERY_ENABLED || "false") !== "false") fail("external partner delivery must remain disabled.");
+if ((process.env.SMKH_APPROVED_SHARING_RECIPIENTS || "[]").trim() !== "[]") fail("approved sharing recipients must remain empty for this release.");
 if (process.env.NEXT_PUBLIC_ROBOTS_INDEX !== "true") fail("search indexing must be enabled for this approved release.");
 if (notificationRecipient.toLowerCase() !== expected.ownerEmail) fail("the notification recipient is not the Workside owner only.");
 if (!/^G-[A-Z0-9]+$/.test(gaMeasurementId)) fail("NEXT_PUBLIC_GA_MEASUREMENT_ID is not a valid GA4 measurement ID.");
@@ -79,6 +81,18 @@ if (
 ) {
   fail("the active Workside Software owner membership was not found.");
 }
+
+const suppressionResponse = await fetch(`${supabaseUrl}/rest/v1/rpc/smkh_is_sharing_suppressed`, {
+  method: "POST",
+  headers: {
+    apikey: secretKey,
+    Authorization: `Bearer ${secretKey}`,
+    "content-type": "application/json",
+  },
+  body: JSON.stringify({ p_identifier_hashes: ["0".repeat(64)] }),
+});
+if (!suppressionResponse.ok) fail("the SMKH sharing-suppression RPC is unavailable.");
+if (typeof (await suppressionResponse.json()) !== "boolean") fail("the SMKH sharing-suppression RPC returned an invalid response.");
 
 console.log(
   `Production configuration verified for ${expected.projectRef}, ${expected.ownerDisplayName}, notifications disabled, and indexing enabled.`,

@@ -5,7 +5,8 @@ import RelatedResources from "@/components/RelatedResources";
 import { buildPageMetadata } from "@/lib/site";
 
 const faqs = [
-  ["Does Sell My Kern Home buy houses?", "This website provides an inquiry channel and does not promise that Sell My Kern Home or another party will buy a property. Any proposed role, contracting party, or transaction terms would need to be identified and documented separately."],
+  ["Does Sell My Kern Home buy houses?", "No. Workside Software and Sell My Kern Home are not property buyers or brokerages. If you separately consent and an approved independent wholesaler or investor is later available, that company must identify its own role and terms."],
+  ["How is Workside Software paid?", "An approved independent wholesaler or investor may pay Workside Software a flat fee for a contact. The fee does not depend on whether you sign or sell, the price you receive, or whether a closing occurs. Workside does not receive part of your sale proceeds. External delivery is currently disabled."],
   ["Is submitting the form an agreement to sell?", "No. It is a request to be contacted about the property. No agency, brokerage, purchase, or other contractual relationship is created by submitting an inquiry."],
   ["What information should I provide?", "The address, your preferred contact method, and a short description of the situation are enough to start. Property type, condition, occupancy, timing, and comments are optional."],
   ["What information should I leave out?", "Do not include bank or mortgage details, Social Security numbers, door or alarm codes, legal documents, or other sensitive information."],

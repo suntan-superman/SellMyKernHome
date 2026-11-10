@@ -7,7 +7,7 @@ const root = path.resolve(import.meta.dirname, "..");
 const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 
 test("all required public routes exist", () => {
-  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/terms/page.js","app/thank-you/page.js"];
+  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/privacy-choices/page.js","app/terms/page.js","app/thank-you/page.js"];
   for (const route of routes) assert.equal(fs.existsSync(path.join(root, route)), true, route);
 });
 test("admin login provides an accessible password visibility control", () => {
@@ -99,12 +99,28 @@ test("structured data identifies Workside as operator and SMKH as its public bra
   assert.match(homepage, /brand: \{ "@type": "Brand", name: SITE_NAME \}/);
   assert.doesNotMatch(homepage, /DRE|licenseNumber|brokerage affiliation/i);
 });
-test("lead consent evidence preserves type, version, hash, timestamp, source, and choices", () => {
+test("lead consent evidence preserves separate privacy, sharing, and marketing choices", () => {
   const leads = read("lib/leads.js");
-  for (const field of ["consent_type", "privacy_version", "privacy_notice_sha256", "privacy_at", "submission_source", "marketing_consent", "marketing_notice_version", "marketing_notice_sha256", "marketing_consent_at", "external_sharing_consent"]) {
+  for (const field of ["consent_type", "privacy_version", "privacy_notice_sha256", "privacy_at", "submission_source", "sharing_consent_selected", "sharing_notice_version", "sharing_notice_sha256", "sharing_consent_at", "approved_recipient_snapshot", "sharing_suppressed", "automated_marketing_consent", "marketing_notice_version", "marketing_notice_sha256", "marketing_consent_at", "external_sharing_consent"]) {
     assert.match(leads, new RegExp(field));
   }
-  assert.match(leads, /external_sharing_consent: false/);
+  assert.match(leads, /partner\.sharingAvailable/);
+  assert.match(read("lib/partner-config.js"), /SMKH_PARTNER_DELIVERY_ENABLED === "true"/);
+  assert.match(read("lib/partner-config.js"), /approvedRecipients\.length > 0/);
+});
+test("privacy opt-out is durable, discoverable, and suppresses future transfers", () => {
+  const footer = read("components/Footer.js");
+  const route = read("app/api/privacy-requests/route.js");
+  const privacy = read("lib/privacy-requests.js");
+  const migration = read("supabase/migrations/20261110_smkh_privacy_choices.sql");
+  assert.match(footer, /Do Not Sell or Share My Personal Information/);
+  assert.match(route, /validatePrivacyRequest/);
+  assert.match(route, /verifyTurnstile/);
+  assert.match(privacy, /smkh_create_privacy_request/);
+  assert.match(privacy, /smkh_is_sharing_suppressed/);
+  assert.match(migration, /create table public\.smkh_sharing_suppressions/i);
+  assert.match(migration, /external_sharing_consent.*false/is);
+  assert.doesNotMatch(migration, /grant[^;]*to (?:public|anon)/i);
 });
 test("Merxus prompt is limited to first-party lead intake", () => {
   const prompt = read("docs/Merxus_AI_Prompt/Prompt.md");
@@ -246,6 +262,6 @@ test("seller endpoint validates before server-side lead creation", () => {
   assert.match(route, /validateSellerLead\(input\)/);
   assert.match(route, /passesHoneypot\(validation\.data\)/);
   assert.match(route, /verifyTurnstile\(input\.turnstileToken, ip\)/);
-  assert.match(route, /createSellerLead\(validation\.data\)/);
+  assert.match(route, /createSellerLead\(validation\.data, \{ partner \}\)/);
 });
 

@@ -22,7 +22,7 @@ test("homepage, navigation, and seller form are accessible", async ({ page }) =>
   await page.getByLabel("Your name").fill("Synthetic Seller");
   await page.getByLabel("Email address").fill("seller@example.test");
   await expect(continueButton).toBeDisabled();
-  const privacy = page.getByRole("checkbox", { name: /I understand SellMyKernHome\.com is a homeowner inquiry/ });
+  const privacy = page.getByRole("checkbox", { name: /I acknowledge the Privacy Policy/ });
   await privacy.check();
   await expect(privacy).toBeChecked();
   await expect(continueButton).toBeEnabled();
@@ -48,7 +48,7 @@ test("phone contact formats as a US number and uses the brand radio accent", asy
 });
 
 test("required public routes return useful pages", async ({ page }) => {
-  for (const route of ["/how-it-works","/selling-situations","/sell-your-house-bakersfield","/sell-house-as-is-bakersfield","/sell-inherited-house-bakersfield","/sell-house-needs-repairs-bakersfield","/sell-rental-property-bakersfield","/selling-situations/vacant-property","/selling-situations/relocating","/about","/faq","/contact","/privacy-policy","/terms","/insights"]) {
+  for (const route of ["/how-it-works","/selling-situations","/sell-your-house-bakersfield","/sell-house-as-is-bakersfield","/sell-inherited-house-bakersfield","/sell-house-needs-repairs-bakersfield","/sell-rental-property-bakersfield","/selling-situations/vacant-property","/selling-situations/relocating","/about","/faq","/contact","/privacy-policy","/privacy-choices","/terms","/insights"]) {
     const response = await page.goto(route); expect(response.ok(), route).toBeTruthy(); await expect(page.locator("h1")).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow, `${route} horizontal overflow`).toBeLessThanOrEqual(1);
@@ -126,10 +126,40 @@ test("both contact-form steps have no serious or critical accessibility violatio
   await page.getByLabel("ZIP code").fill("93301");
   await page.getByLabel("Your name").fill("Synthetic Seller");
   await page.getByLabel("Email address").fill("seller@example.test");
-  await page.getByRole("checkbox", { name: /I understand SellMyKernHome\.com is a homeowner inquiry/ }).check();
+  await page.getByRole("checkbox", { name: /I acknowledge the Privacy Policy/ }).check();
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByRole("heading", { name: "Add property details" })).toBeVisible();
   expect(await analyze()).toEqual([]);
+});
+
+test("sharing remains disabled and first-party intake does not require optional marketing", async ({ page }) => {
+  await page.goto("/contact");
+  await page.getByLabel("Property street address").fill("123 Test Street");
+  await page.getByLabel("City").fill("Bakersfield");
+  await page.getByLabel("ZIP code").fill("93301");
+  await page.getByLabel("Your name").fill("Synthetic Seller");
+  await page.getByLabel("Email address").fill("seller@example.test");
+  await page.getByRole("checkbox", { name: /I acknowledge the Privacy Policy/ }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+  const sharing = page.getByRole("checkbox", { name: /I authorize Workside Software to share/ });
+  const marketing = page.getByRole("checkbox", { name: /including by automated, prerecorded, or artificial-voice means/ });
+  await expect(sharing).toBeDisabled();
+  await expect(sharing).not.toBeChecked();
+  await expect(marketing).toBeEnabled();
+  await expect(marketing).not.toBeChecked();
+  await expect(page.getByText(/External partner delivery is currently disabled/).first()).toBeVisible();
+  await expect(page.getByText(/Workside Software is a technology company, not a broker or buyer/).first()).toBeVisible();
+});
+
+test("privacy choices page exposes a distinct noindex suppression form", async ({ page }) => {
+  await page.goto("/privacy-choices");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Control future sharing of your information");
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  const button = page.getByRole("button", { name: "Record My Privacy Choice" });
+  await expect(button).toBeDisabled();
+  await page.getByLabel(/Email address/).fill("seller@example.test");
+  await page.getByRole("checkbox", { name: /suppress future sale or sharing/ }).check();
+  await expect(page.getByText(/does not automatically retrieve information previously disclosed/).first()).toBeVisible();
 });
 
 test("captures the homepage review layout", async ({ page }, testInfo) => {

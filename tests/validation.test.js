@@ -1,16 +1,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { MARKETING_NOTICE_SHA256, MARKETING_NOTICE_VERSION, PRIVACY_NOTICE_SHA256, PRIVACY_NOTICE_VERSION } from "../lib/consent-notices.js";
-import { formatPhoneNumber, passesHoneypot, splitName, validateSellerLead } from "../lib/validation.js";
+import { MARKETING_NOTICE_SHA256, MARKETING_NOTICE_VERSION, PRIVACY_NOTICE_SHA256, PRIVACY_NOTICE_VERSION, PRIVACY_REQUEST_NOTICE_SHA256, PRIVACY_REQUEST_NOTICE_VERSION, SHARING_NOTICE_SHA256, SHARING_NOTICE_VERSION } from "../lib/consent-notices.js";
+import { formatPhoneNumber, passesHoneypot, splitName, validatePrivacyRequest, validateSellerLead } from "../lib/validation.js";
 
 function valid(overrides = {}) {
-  return { submissionToken: "8ed0fe14-00f0-4bf0-95b5-d3fd34dd1030", propertyAddress: "123 Test Street", propertyCity: "Bakersfield", propertyZip: "93301", name: "Synthetic Seller", preferredContact: "email", email: "seller@example.test", phone: "", privacyAcknowledged: true, marketingConsent: false, propertyType: "Single-family home", condition: "Unsure", occupancy: "Vacant", timing: "Exploring options", comments: "Synthetic test data only.", website: "", startedAt: Date.now() - 5000, consentVersion: PRIVACY_NOTICE_VERSION, consentNoticeHash: PRIVACY_NOTICE_SHA256, marketingConsentVersion: MARKETING_NOTICE_VERSION, marketingConsentNoticeHash: MARKETING_NOTICE_SHA256, landingUrl: "https://example.test/contact", ...overrides };
+  return { submissionToken: "8ed0fe14-00f0-4bf0-95b5-d3fd34dd1030", propertyAddress: "123 Test Street", propertyCity: "Bakersfield", propertyZip: "93301", name: "Synthetic Seller", preferredContact: "email", email: "seller@example.test", phone: "", privacyAcknowledged: true, sharingConsent: false, marketingConsent: false, propertyType: "Single-family home", condition: "Unsure", occupancy: "Vacant", timing: "Exploring options", comments: "Synthetic test data only.", website: "", startedAt: Date.now() - 5000, consentVersion: PRIVACY_NOTICE_VERSION, consentNoticeHash: PRIVACY_NOTICE_SHA256, sharingConsentVersion: SHARING_NOTICE_VERSION, sharingConsentNoticeHash: SHARING_NOTICE_SHA256, marketingConsentVersion: MARKETING_NOTICE_VERSION, marketingConsentNoticeHash: MARKETING_NOTICE_SHA256, landingUrl: "https://example.test/contact", ...overrides };
 }
 
 test("accepts a valid seller inquiry and preserves separate consent", () => {
   const result = validateSellerLead(valid());
   assert.equal(result.valid, true);
   assert.equal(result.data.marketingConsent, false);
+  assert.equal(result.data.sharingConsent, false);
   assert.equal(result.data.attribution.landing_url, "https://example.test/contact");
 });
 test("requires the selected contact method", () => {
@@ -32,6 +33,13 @@ test("rejects stale or altered consent evidence", () => {
   const stale = validateSellerLead(valid({ consentVersion: "2026-10-14-draft" })); assert.equal(stale.valid, false); assert.ok(stale.errors.privacyAcknowledged);
   const changed = validateSellerLead(valid({ consentNoticeHash: "0".repeat(64) })); assert.equal(changed.valid, false); assert.ok(changed.errors.privacyAcknowledged);
   const marketing = validateSellerLead(valid({ marketingConsent: true, marketingConsentNoticeHash: "0".repeat(64) })); assert.equal(marketing.valid, false); assert.ok(marketing.errors.marketingConsent);
+  const sharing = validateSellerLead(valid({ sharingConsent: true, sharingConsentNoticeHash: "0".repeat(64) })); assert.equal(sharing.valid, false); assert.ok(sharing.errors.sharingConsent);
+});
+test("validates a separate do-not-sell-or-share request", () => {
+  const request = validatePrivacyRequest({ requestToken: "7ed0fe14-00f0-4bf0-95b5-d3fd34dd1030", email: "seller@example.test", phone: "", acknowledged: true, noticeVersion: PRIVACY_REQUEST_NOTICE_VERSION, noticeHash: PRIVACY_REQUEST_NOTICE_SHA256, website: "", startedAt: Date.now() - 5000 });
+  assert.equal(request.valid, true);
+  const missing = validatePrivacyRequest({ requestToken: "7ed0fe14-00f0-4bf0-95b5-d3fd34dd1030", acknowledged: true, noticeVersion: PRIVACY_REQUEST_NOTICE_VERSION, noticeHash: PRIVACY_REQUEST_NOTICE_SHA256 });
+  assert.ok(missing.errors.contact);
 });
 test("honeypot rejects bots, instant posts, and stale forms", () => {
   const now = Date.now(); assert.equal(passesHoneypot({ website: "spam", startedAt: now - 5000 }, now), false); assert.equal(passesHoneypot({ website: "", startedAt: now - 100 }, now), false); assert.equal(passesHoneypot({ website: "", startedAt: now - 25 * 60 * 60 * 1000 }, now), false); assert.equal(passesHoneypot({ website: "", startedAt: now - 5000 }, now), true);

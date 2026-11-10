@@ -11,7 +11,11 @@ import {
   PRIVACY_NOTICE_SHA256,
   PRIVACY_NOTICE_TEXT,
   PRIVACY_NOTICE_VERSION,
+  SHARING_NOTICE_SHA256,
+  SHARING_NOTICE_TEXT,
+  SHARING_NOTICE_VERSION,
 } from "@/lib/consent-notices";
+import { PARTNER_DELIVERY_DISABLED_TEXT, SHORT_DISCLOSURE_TEXT } from "@/lib/disclosures";
 import { BUSINESS_PHONE_DISPLAY, BUSINESS_PHONE_SERVICE_LABEL } from "@/lib/site";
 import { formatPhoneNumber } from "@/lib/validation";
 import PhoneLink from "./PhoneLink";
@@ -19,7 +23,7 @@ import TurnstileWidget from "./TurnstileWidget";
 
 const empty = {
   propertyAddress: "", propertyCity: "", propertyZip: "", name: "", preferredContact: "email", email: "", phone: "",
-  privacyAcknowledged: false, marketingConsent: false, propertyType: "", condition: "", occupancy: "", timing: "", comments: "", website: "",
+  privacyAcknowledged: false, sharingConsent: false, marketingConsent: false, propertyType: "", condition: "", occupancy: "", timing: "", comments: "", website: "",
 };
 
 function firstStepErrors(data) {
@@ -48,7 +52,7 @@ function getAttribution() {
   };
 }
 
-export default function PropertyForm({ compact = false, initialAddress = "", turnstileSiteKey = "" }) {
+export default function PropertyForm({ compact = false, initialAddress = "", turnstileSiteKey = "", sharingAvailable = false, approvedSharingRecipients = [] }) {
   const router = useRouter();
   const startedAt = useRef(Date.now());
   const submissionToken = useRef(globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`);
@@ -105,6 +109,8 @@ export default function PropertyForm({ compact = false, initialAddress = "", tur
           startedAt: startedAt.current,
           consentVersion: PRIVACY_NOTICE_VERSION,
           consentNoticeHash: PRIVACY_NOTICE_SHA256,
+          sharingConsentVersion: SHARING_NOTICE_VERSION,
+          sharingConsentNoticeHash: SHARING_NOTICE_SHA256,
           marketingConsentVersion: MARKETING_NOTICE_VERSION,
           marketingConsentNoticeHash: MARKETING_NOTICE_SHA256,
         }),
@@ -150,9 +156,14 @@ export default function PropertyForm({ compact = false, initialAddress = "", tur
       <div><label htmlFor="occupancy">Occupancy <span>Optional</span></label><select id="occupancy" name="occupancy" value={data.occupancy} onChange={update}><option value="">Choose one</option><option>Owner occupied</option><option>Tenant occupied</option><option>Vacant</option><option>Other</option></select></div>
       <div><label htmlFor="timing">Desired timing <span>Optional</span></label><select id="timing" name="timing" value={data.timing} onChange={update}><option value="">Choose one</option><option>Exploring options</option><option>Within 30 days</option><option>1–3 months</option><option>3+ months</option><option>Unsure</option></select></div>
       <div className="field-wide"><label htmlFor="comments">What would be helpful for us to know? <span>Optional</span></label><textarea id="comments" name="comments" rows="4" maxLength="2000" value={data.comments} onChange={update} /><small>Do not include bank, mortgage, access-code, or other sensitive information.</small></div>
+      <div className="field-wide consent-choice-group">
+        <label className="check-field"><input type="checkbox" name="sharingConsent" checked={data.sharingConsent} onChange={update} disabled={!sharingAvailable} aria-invalid={Boolean(errors.sharingConsent)} aria-describedby={describedBy("sharingConsent")} /><span>{SHARING_NOTICE_TEXT}</span></label>{fieldError("sharingConsent")}
+        {sharingAvailable ? <p className="consent-recipient-list"><strong>Approved recipients:</strong> {approvedSharingRecipients.map((recipient) => recipient.name).join(", ")}.</p> : <p className="consent-unavailable"><strong>Not currently available:</strong> {PARTNER_DELIVERY_DISABLED_TEXT}</p>}
+      </div>
       <label className="check-field field-wide"><input type="checkbox" name="marketingConsent" checked={data.marketingConsent} onChange={update} aria-invalid={Boolean(errors.marketingConsent)} aria-describedby={describedBy("marketingConsent")} /><span>{MARKETING_NOTICE_TEXT}</span></label>{fieldError("marketingConsent")}
       <div className="field-wide"><TurnstileWidget siteKey={turnstileSiteKey} onToken={setTurnstileToken} onStatus={setMessage} resetSignal={turnstileResetSignal} /></div>
       {message ? <div className="form-alert field-wide" role="alert">{message}</div> : null}
+      <p className="submit-disclosure field-wide">{SHORT_DISCLOSURE_TEXT}</p>
       <div className="form-actions field-wide"><button className="button button-secondary" type="button" onClick={() => setStep(1)}><ArrowLeft size={18} /> Back</button><button className="button" type="submit" disabled={busy || !turnstileToken}>{busy ? <><LoaderCircle className="spin" size={18} /> Sending…</> : <>Send My Inquiry <Check size={18} /></>}</button></div>
     </div>}
     {step === 1 && message ? <div className="form-alert" role="alert">{message}</div> : null}

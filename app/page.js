@@ -11,7 +11,7 @@ import PhoneLink from "@/components/PhoneLink";
 import { BUSINESS_PHONE_DISPLAY, BUSINESS_PHONE_E164, BUSINESS_PHONE_SERVICE_LABEL, OPERATOR_DISCLOSURE, OPERATOR_NAME, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const faqs = [
-  ["What happens after I submit?", "We review the details you provide and contact you using your preferred method to learn more. Submitting is a request for a conversation, not a commitment to sell."],
+  ["What happens after I submit?", "Authorized Sell My Kern Home administrators review the details and may contact you using your preferred method. External sharing requires a separate choice, an identified approved recipient, and an active delivery workflow. Submitting is not a commitment to sell."],
   ["Do I need to know exactly what I want to do?", "No. You can begin by sharing the property and your priorities. We will not assume a particular transaction path before discussing your situation."],
   ["Should I include mortgage or financial information?", "No. Please do not send mortgage balances, bank details, access codes, or other sensitive information through this form."],
 ];
@@ -30,7 +30,7 @@ export default function HomePage() {
       <div className="hero-form-wrap"><PropertyForm compact {...form} /></div>
     </section>
 
-    <section className="reassurance"><p><strong>A useful conversation starts with the property—not pressure.</strong> Your inquiry goes only to {form.recipientTeam} for review. It is not currently shared with independent professionals or property buyers. Share only what feels relevant now.</p></section>
+    <section className="reassurance"><p><strong>A useful conversation starts with the property—not pressure.</strong> Your inquiry goes only to {form.recipientTeam} for first-party review. External partner delivery is currently disabled and requires a separate permission and identified approved recipient before activation. Share only what feels relevant now.</p></section>
 
     <section className="section content-shell"><div className="section-heading"><div><p className="eyebrow">WHERE WE CAN START</p><h2>Situations We Can Discuss</h2></div><p>Every property comes with a different story. These guides can help you organize the facts and questions that matter before a conversation.</p></div><SituationGrid /><p className="section-link"><Link className="text-link" href="/sell-your-house-bakersfield">Compare Bakersfield home-selling options <ArrowRight size={17} /></Link></p></section>
 

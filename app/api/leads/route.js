@@ -4,6 +4,7 @@ import { createServiceClient } from "@/lib/supabase";
 import { checkRateLimit, getRequestIp, verifyTurnstile } from "@/lib/rateLimit";
 import { passesHoneypot, validateSellerLead } from "@/lib/validation";
 import { SITE_URL } from "@/lib/site";
+import { getPartnerDeliveryConfiguration } from "@/lib/partner-config";
 
 function isAllowedOrigin(request) {
   const origin = request.headers.get("origin"); if (!origin) return true;
@@ -24,9 +25,11 @@ export async function POST(request) {
     const input = await request.json();
     const validation = validateSellerLead(input);
     if (!validation.valid) return NextResponse.json({ message: "Review the highlighted information.", errors: validation.errors }, { status: 422 });
+    const partner = getPartnerDeliveryConfiguration();
+    if (validation.data.sharingConsent && !partner.sharingAvailable) return NextResponse.json({ message: "External sharing is not currently available. Your first-party inquiry can still be submitted without it.", errors: { sharingConsent: "No approved external recipient and active delivery workflow are available." } }, { status: 422 });
     if (!passesHoneypot(validation.data)) return NextResponse.json({ message: "The request could not be verified." }, { status: 400 });
     if (!(await verifyTurnstile(input.turnstileToken, ip))) return NextResponse.json({ message: "Please complete the anti-spam check." }, { status: 400 });
-    const result = await createSellerLead(validation.data);
+    const result = await createSellerLead(validation.data, { partner });
     return NextResponse.json({ ok: true, reference: result.lead.reference, duplicate: result.duplicate }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     const setup = error.message?.includes("not configured"); if (!setup) console.error("Seller inquiry failed", { message: error.message });
