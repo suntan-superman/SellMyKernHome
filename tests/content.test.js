@@ -80,6 +80,7 @@ test("net proceeds calculator is indexable, linked, structured, and non-persiste
   assert.match(page, /"@type": "WebApplication"/);
   assert.match(page, /hypothetical examples/i);
   assert.match(page, /LeadGenerationDisclosure/);
+  assert.match(page, /OPERATOR_DISCLOSURE/);
   assert.match(sitemap, /\/tools\/home-sale-net-proceeds-calculator/);
   for (const source of [article, sellerPages, insights]) assert.match(source, /\/tools\/home-sale-net-proceeds-calculator/);
   assert.doesNotMatch(calculator, /fetch\(|localStorage|sessionStorage|supabase|email/i);
