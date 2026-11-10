@@ -7,7 +7,7 @@ const root = path.resolve(import.meta.dirname, "..");
 const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 
 test("all required public routes exist", () => {
-  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/privacy-choices/page.js","app/terms/page.js","app/thank-you/page.js"];
+  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/privacy-choices/page.js","app/terms/page.js","app/thank-you/page.js","app/tools/home-sale-net-proceeds-calculator/page.js"];
   for (const route of routes) assert.equal(fs.existsSync(path.join(root, route)), true, route);
 });
 test("admin login provides an accessible password visibility control", () => {
@@ -66,6 +66,23 @@ test("approved as-is article includes the authorized comparison, guidance, and r
   assert.match(route, /"@type": "Article"/);
   assert.match(route, /SHORT_DISCLOSURE_TEXT/);
   assert.match(route, /metadata\.title = \{ absolute: article\.metaTitle \}/);
+});
+test("net proceeds calculator is indexable, linked, structured, and non-persistent", () => {
+  const page = read("app/tools/home-sale-net-proceeds-calculator/page.js");
+  const calculator = read("components/NetProceedsCalculator.js");
+  const sitemap = read("app/sitemap.js");
+  const article = read("content/articles.js");
+  const sellerPages = read("content/seller-pages.js");
+  const insights = read("app/insights/page.js");
+  assert.match(page, /Home Sale Net Proceeds Calculator \| Bakersfield CA/);
+  assert.match(page, /path = "\/tools\/home-sale-net-proceeds-calculator"/);
+  assert.match(page, /title: \{ absolute: title \}/);
+  assert.match(page, /"@type": "WebApplication"/);
+  assert.match(page, /hypothetical examples/i);
+  assert.match(page, /LeadGenerationDisclosure/);
+  assert.match(sitemap, /\/tools\/home-sale-net-proceeds-calculator/);
+  for (const source of [article, sellerPages, insights]) assert.match(source, /\/tools\/home-sale-net-proceeds-calculator/);
+  assert.doesNotMatch(calculator, /fetch\(|localStorage|sessionStorage|supabase|email/i);
 });
 test("reviewed seller landing pages are eligible only behind the master indexing gate", () => {
   const pages = read("content/seller-pages.js");
@@ -241,6 +258,16 @@ test("analytics sends only allow-listed non-PII parameters", () => {
   assert.match(source, /allowedParameters = new Set\(\["location", "destination", "form", "step", "error_count", "source"\]\)/);
   assert.match(source, /allowedParameters\.has\(key\)/);
   assert.doesNotMatch(source, /name", "email|phone", "address|notes|comment/);
+});
+test("calculator analytics are consent-gated and never include financial inputs", () => {
+  const analytics = read("lib/analytics.js");
+  const calculator = read("components/NetProceedsCalculator.js");
+  for (const event of ["calculator_view", "calculator_interaction", "calculator_cta_click"]) assert.match(analytics, new RegExp(event));
+  assert.match(calculator, /track\("calculator_view", \{ location: "net_proceeds_calculator" \}\)/);
+  assert.match(calculator, /track\("calculator_interaction", \{ location: "net_proceeds_calculator" \}\)/);
+  assert.match(calculator, /data-analytics-event="calculator_cta_click"/);
+  assert.doesNotMatch(calculator, /track\([^\n]*(?:salePrice|repairBudget|mortgagePayoff|sellingExpense)/);
+  assert.doesNotMatch(analytics, /"sale_price"|"mortgage"|"repair_budget"|"financial_value"/);
 });
 test("seller funnel uses the approved non-PII event taxonomy", () => {
   const form = read("components/PropertyForm.js");

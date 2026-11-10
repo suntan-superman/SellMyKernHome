@@ -75,6 +75,35 @@ test("the approved as-is article is public while the other drafts remain inacces
   }
 });
 
+test("net proceeds calculator updates, resets, and remains responsive", async ({ page }) => {
+  const response = await page.goto("/tools/home-sale-net-proceeds-calculator");
+  expect(response.ok()).toBeTruthy();
+  await expect(page).toHaveTitle("Home Sale Net Proceeds Calculator | Bakersfield CA");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Free Home Sale Net Proceeds Calculator");
+  await expect(page.getByTestId("repair-net")).toHaveText("$272,800.00");
+  await expect(page.getByTestId("as-is-net")).toHaveText("$268,500.00");
+  await expect(page.getByTestId("difference")).toHaveText("$4,300.00");
+
+  await page.getByLabel("Estimated repair budget").fill("0");
+  await expect(page.getByTestId("repair-net")).toHaveText("$297,800.00");
+  await expect(page.getByTestId("difference")).toHaveText("$29,300.00");
+  await page.getByLabel(/Outstanding mortgage and lien payoff/).fill("100000");
+  await expect(page.getByTestId("repair-net")).toHaveText("$197,800.00");
+  await expect(page.getByTestId("as-is-net")).toHaveText("$168,500.00");
+  await expect(page.getByTestId("difference")).toHaveText("$29,300.00");
+
+  await page.getByRole("button", { name: "Reset Example" }).click();
+  await expect(page.getByLabel("Estimated repair budget")).toHaveValue("25000");
+  await expect(page.getByTestId("repair-net")).toHaveText("$272,800.00");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://sellmykernhome.com/tools/home-sale-net-proceeds-calculator");
+  await expect(page.locator("h1")).toHaveCount(1);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+  const results = await new AxeBuilder({ page }).include(".calculator-shell").withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  const blocking = results.violations.filter((item) => ["serious", "critical"].includes(item.impact));
+  expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([]);
+});
+
 test("Bakersfield selling-path comparison is readable and accessible", async ({ page }) => {
   await page.goto("/sell-your-house-bakersfield");
   await expect(page).toHaveTitle(/Sell Your House in Bakersfield/);

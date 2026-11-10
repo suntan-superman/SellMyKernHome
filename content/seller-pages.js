@@ -53,6 +53,7 @@ export const sellerPages = {
     questions: ["Which repairs, if any, does the proposed agreement require?", "Can the terms change after an inspection or due-diligence period?", "What are the expected net proceeds after all costs?", "What happens if either party cannot meet the proposed date?"],
     sources: [["California Department of Real Estate: Disclosures in Real Property Transactions", "https://www.dre.ca.gov/files/pdf/re6.pdf"]],
     related: [
+      ["/tools/home-sale-net-proceeds-calculator", "Estimate and compare potential net proceeds"],
       ["/insights/sell-as-is-or-repair-bakersfield", "Compare selling as-is with making repairs"],
       ["/sell-house-needs-repairs-bakersfield", "Options when a house needs repairs"],
       ["/sell-your-house-bakersfield", "Compare Bakersfield home-selling options"],

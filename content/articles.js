@@ -30,7 +30,7 @@ export const articles = [
       ["What should I compare in an as-is proposal?", "Review the buyer's qualifications, price, deposits, inspections, contingencies, assignment provisions, costs, cancellation rights, possession, and closing terms. Consider independent advice before signing an agreement you do not fully understand."],
     ],
     sources: [["California Department of Real Estate: Disclosures in Real Property Transactions", "https://www.dre.ca.gov/files/pdf/re6.pdf"]],
-    related: [["/sell-house-as-is-bakersfield", "Selling a house as-is in Bakersfield"], ["/sell-your-house-bakersfield", "Compare Bakersfield home-selling options"], ["/contact", "Tell us about your property"]],
+    related: [["/tools/home-sale-net-proceeds-calculator", "Try the home sale net proceeds calculator"], ["/sell-house-as-is-bakersfield", "Selling a house as-is in Bakersfield"], ["/sell-your-house-bakersfield", "Compare Bakersfield home-selling options"], ["/contact", "Tell us about your property"]],
   },
   {
     slug: "selling-inherited-property-kern-county",
