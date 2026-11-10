@@ -6,13 +6,15 @@ import JsonLd from "@/components/JsonLd";
 import { articles, getArticle } from "@/content/articles";
 import { SITE_NAME, absoluteUrl, buildPageMetadata } from "@/lib/site";
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
-  return articles.map(({ slug }) => ({ slug }));
+  return articles.filter((article) => article.approvedForIndexing).map(({ slug }) => ({ slug }));
 }
 
 export async function generateMetadata({ params }) {
   const article = getArticle((await params).slug);
-  if (!article) return {};
+  if (!article?.approvedForIndexing) return {};
   const metadata = buildPageMetadata({ title: article.title, description: article.description, path: `/insights/${article.slug}`, indexable: article.approvedForIndexing, type: "article" });
   metadata.openGraph.modifiedTime = article.updated;
   return metadata;
@@ -20,7 +22,7 @@ export async function generateMetadata({ params }) {
 
 export default async function ArticlePage({ params }) {
   const article = getArticle((await params).slug);
-  if (!article) notFound();
+  if (!article?.approvedForIndexing) notFound();
   const schema = {
     "@context": "https://schema.org",
     "@type": "Article",

@@ -4,6 +4,14 @@ import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, LoaderCircle, LockKeyhole } from "lucide-react";
 import { track } from "@/lib/analytics";
+import {
+  MARKETING_NOTICE_SHA256,
+  MARKETING_NOTICE_TEXT,
+  MARKETING_NOTICE_VERSION,
+  PRIVACY_NOTICE_SHA256,
+  PRIVACY_NOTICE_TEXT,
+  PRIVACY_NOTICE_VERSION,
+} from "@/lib/consent-notices";
 import { BUSINESS_PHONE_DISPLAY, BUSINESS_PHONE_SERVICE_LABEL } from "@/lib/site";
 import { formatPhoneNumber } from "@/lib/validation";
 import PhoneLink from "./PhoneLink";
@@ -40,7 +48,7 @@ function getAttribution() {
   };
 }
 
-export default function PropertyForm({ compact = false, initialAddress = "", turnstileSiteKey = "", recipientName = "Sell My Kern Home" }) {
+export default function PropertyForm({ compact = false, initialAddress = "", turnstileSiteKey = "" }) {
   const router = useRouter();
   const startedAt = useRef(Date.now());
   const submissionToken = useRef(globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random()}`);
@@ -89,7 +97,17 @@ export default function PropertyForm({ compact = false, initialAddress = "", tur
     try {
       const response = await fetch("/api/leads", {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ ...data, ...getAttribution(), turnstileToken, submissionToken: submissionToken.current, startedAt: startedAt.current, consentVersion: "2026-10-14-draft" }),
+        body: JSON.stringify({
+          ...data,
+          ...getAttribution(),
+          turnstileToken,
+          submissionToken: submissionToken.current,
+          startedAt: startedAt.current,
+          consentVersion: PRIVACY_NOTICE_VERSION,
+          consentNoticeHash: PRIVACY_NOTICE_SHA256,
+          marketingConsentVersion: MARKETING_NOTICE_VERSION,
+          marketingConsentNoticeHash: MARKETING_NOTICE_SHA256,
+        }),
       });
       const result = await response.json();
       if (!response.ok) {
@@ -123,7 +141,7 @@ export default function PropertyForm({ compact = false, initialAddress = "", tur
       <div className="field-wide"><label htmlFor="name">Your name</label><input id="name" name="name" autoComplete="name" value={data.name} onChange={update} aria-invalid={Boolean(errors.name)} aria-describedby={describedBy("name")} />{fieldError("name")}</div>
       <fieldset className="field-wide"><legend>How should we contact you?</legend><div className="choice-row"><label><input type="radio" name="preferredContact" value="email" checked={data.preferredContact === "email"} onChange={update} /> Email</label><label><input type="radio" name="preferredContact" value="phone" checked={data.preferredContact === "phone"} onChange={update} /> Phone</label></div></fieldset>
       {data.preferredContact === "email" ? <div className="field-wide"><label htmlFor="email">Email address</label><input id="email" name="email" type="email" autoComplete="email" value={data.email} onChange={update} aria-invalid={Boolean(errors.email)} aria-describedby={describedBy("email")} />{fieldError("email")}</div> : <div className="field-wide"><label htmlFor="phone">Phone number</label><input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel-national" maxLength="14" pattern={"\\([0-9]{3}\\) [0-9]{3}-[0-9]{4}"} value={data.phone} onChange={updatePhone} aria-invalid={Boolean(errors.phone)} aria-describedby={describedBy("phone")} placeholder="(661) 555-1234" />{fieldError("phone")}</div>}
-      <label className="check-field field-wide"><input type="checkbox" name="privacyAcknowledged" checked={data.privacyAcknowledged} onChange={update} aria-invalid={Boolean(errors.privacyAcknowledged)} /><span>I understand {recipientName} will use this information to review my inquiry and contact me about this property. See the <a href="/privacy-policy" target="_blank">Privacy Policy</a>.</span></label>{fieldError("privacyAcknowledged")}
+      <label className="check-field field-wide"><input type="checkbox" name="privacyAcknowledged" checked={data.privacyAcknowledged} onChange={update} aria-invalid={Boolean(errors.privacyAcknowledged)} /><span>{PRIVACY_NOTICE_TEXT.slice(0, -"See the Privacy Policy.".length)}See the <a href="/privacy-policy" target="_blank">Privacy Policy</a>.</span></label>{fieldError("privacyAcknowledged")}
       <div className="honeypot" aria-hidden="true"><label htmlFor="website">Website</label><input id="website" name="website" tabIndex="-1" autoComplete="off" value={data.website} onChange={update} /></div>
       <button className="button field-wide" type="button" onClick={continueForm} disabled={!firstStepIsValid} title={!firstStepIsValid ? "Complete all required fields to continue." : undefined}>Continue <ArrowRight size={18} /></button>
     </div> : <div className="form-fields">
@@ -132,13 +150,13 @@ export default function PropertyForm({ compact = false, initialAddress = "", tur
       <div><label htmlFor="occupancy">Occupancy <span>Optional</span></label><select id="occupancy" name="occupancy" value={data.occupancy} onChange={update}><option value="">Choose one</option><option>Owner occupied</option><option>Tenant occupied</option><option>Vacant</option><option>Other</option></select></div>
       <div><label htmlFor="timing">Desired timing <span>Optional</span></label><select id="timing" name="timing" value={data.timing} onChange={update}><option value="">Choose one</option><option>Exploring options</option><option>Within 30 days</option><option>1–3 months</option><option>3+ months</option><option>Unsure</option></select></div>
       <div className="field-wide"><label htmlFor="comments">What would be helpful for us to know? <span>Optional</span></label><textarea id="comments" name="comments" rows="4" maxLength="2000" value={data.comments} onChange={update} /><small>Do not include bank, mortgage, access-code, or other sensitive information.</small></div>
-      <label className="check-field field-wide"><input type="checkbox" name="marketingConsent" checked={data.marketingConsent} onChange={update} /><span>Optional: I agree to receive marketing calls or texts at the number I provide. Consent is not required to submit an inquiry. Message/data rates may apply.</span></label>
+      <label className="check-field field-wide"><input type="checkbox" name="marketingConsent" checked={data.marketingConsent} onChange={update} aria-invalid={Boolean(errors.marketingConsent)} aria-describedby={describedBy("marketingConsent")} /><span>{MARKETING_NOTICE_TEXT}</span></label>{fieldError("marketingConsent")}
       <div className="field-wide"><TurnstileWidget siteKey={turnstileSiteKey} onToken={setTurnstileToken} onStatus={setMessage} resetSignal={turnstileResetSignal} /></div>
       {message ? <div className="form-alert field-wide" role="alert">{message}</div> : null}
       <div className="form-actions field-wide"><button className="button button-secondary" type="button" onClick={() => setStep(1)}><ArrowLeft size={18} /> Back</button><button className="button" type="submit" disabled={busy || !turnstileToken}>{busy ? <><LoaderCircle className="spin" size={18} /> Sending…</> : <>Send My Inquiry <Check size={18} /></>}</button></div>
     </div>}
     {step === 1 && message ? <div className="form-alert" role="alert">{message}</div> : null}
-    <p className="form-fineprint">Submitting an inquiry does not create an agency, brokerage, purchase, or other contractual relationship.</p>
+    <p className="form-fineprint">SellMyKernHome.com is operated by Workside Software as a homeowner inquiry and lead-generation service. We are not a real estate brokerage or property buyer and do not represent buyers or sellers. Submitting an inquiry does not create an agency, brokerage, purchase, or other contractual relationship.</p>
   </form>;
 }
 

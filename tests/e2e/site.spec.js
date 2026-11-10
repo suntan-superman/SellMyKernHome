@@ -22,7 +22,7 @@ test("homepage, navigation, and seller form are accessible", async ({ page }) =>
   await page.getByLabel("Your name").fill("Synthetic Seller");
   await page.getByLabel("Email address").fill("seller@example.test");
   await expect(continueButton).toBeDisabled();
-  const privacy = page.getByRole("checkbox", { name: /I understand Sell My Kern Home/ });
+  const privacy = page.getByRole("checkbox", { name: /I understand SellMyKernHome\.com is a homeowner inquiry/ });
   await privacy.check();
   await expect(privacy).toBeChecked();
   await expect(continueButton).toBeEnabled();
@@ -47,11 +47,20 @@ test("phone contact formats as a US number and uses the brand radio accent", asy
   await expect(phoneChoice).toHaveCSS("accent-color", "rgb(20, 93, 73)");
 });
 
-test("required routes return useful pages", async ({ page }) => {
-  for (const route of ["/how-it-works","/selling-situations","/sell-your-house-bakersfield","/sell-house-as-is-bakersfield","/sell-inherited-house-bakersfield","/sell-house-needs-repairs-bakersfield","/sell-rental-property-bakersfield","/selling-situations/vacant-property","/selling-situations/relocating","/about","/faq","/contact","/privacy-policy","/terms","/insights","/insights/selling-a-house-as-is-bakersfield","/insights/selling-inherited-property-kern-county","/insights/options-when-house-needs-major-repairs","/insights/questions-before-signing-property-purchase-agreement"]) {
+test("required public routes return useful pages", async ({ page }) => {
+  for (const route of ["/how-it-works","/selling-situations","/sell-your-house-bakersfield","/sell-house-as-is-bakersfield","/sell-inherited-house-bakersfield","/sell-house-needs-repairs-bakersfield","/sell-rental-property-bakersfield","/selling-situations/vacant-property","/selling-situations/relocating","/about","/faq","/contact","/privacy-policy","/terms","/insights"]) {
     const response = await page.goto(route); expect(response.ok(), route).toBeTruthy(); await expect(page.locator("h1")).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow, `${route} horizontal overflow`).toBeLessThanOrEqual(1);
+  }
+});
+
+test("unapproved insight drafts are not publicly accessible or linked", async ({ page, request }) => {
+  const drafts = ["selling-a-house-as-is-bakersfield", "selling-inherited-property-kern-county", "options-when-house-needs-major-repairs", "questions-before-signing-property-purchase-agreement"];
+  await page.goto("/insights");
+  for (const slug of drafts) {
+    await expect(page.locator(`a[href="/insights/${slug}"]`)).toHaveCount(0);
+    expect((await request.get(`/insights/${slug}`)).status(), slug).toBe(404);
   }
 });
 
@@ -117,7 +126,7 @@ test("both contact-form steps have no serious or critical accessibility violatio
   await page.getByLabel("ZIP code").fill("93301");
   await page.getByLabel("Your name").fill("Synthetic Seller");
   await page.getByLabel("Email address").fill("seller@example.test");
-  await page.getByRole("checkbox", { name: /I understand Sell My Kern Home/ }).check();
+  await page.getByRole("checkbox", { name: /I understand SellMyKernHome\.com is a homeowner inquiry/ }).check();
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByRole("heading", { name: "Add property details" })).toBeVisible();
   expect(await analyze()).toEqual([]);

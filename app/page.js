@@ -8,7 +8,7 @@ import Process from "@/components/Process";
 import CTA from "@/components/CTA";
 import JsonLd from "@/components/JsonLd";
 import PhoneLink from "@/components/PhoneLink";
-import { BUSINESS_PHONE_DISPLAY, BUSINESS_PHONE_E164, BUSINESS_PHONE_SERVICE_LABEL, SITE_NAME, SITE_URL } from "@/lib/site";
+import { BUSINESS_PHONE_DISPLAY, BUSINESS_PHONE_E164, BUSINESS_PHONE_SERVICE_LABEL, OPERATOR_DISCLOSURE, OPERATOR_NAME, SITE_NAME, SITE_URL } from "@/lib/site";
 
 const faqs = [
   ["What happens after I submit?", "We review the details you provide and contact you using your preferred method to learn more. Submitting is a request for a conversation, not a commitment to sell."],
@@ -19,7 +19,7 @@ const faqs = [
 export default function HomePage() {
   const form = getSellerFormConfiguration();
   const websiteSchema = { "@context": "https://schema.org", "@graph": [
-    { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: SITE_NAME, url: SITE_URL, logo: `${SITE_URL}/icon.svg`, telephone: BUSINESS_PHONE_E164, contactPoint: { "@type": "ContactPoint", telephone: BUSINESS_PHONE_E164, contactType: "property inquiries", availableLanguage: "English" }, description: "An independent seller-inquiry and property-opportunity service for Bakersfield and Kern County." },
+    { "@type": "Organization", "@id": `${SITE_URL}/#organization`, name: OPERATOR_NAME, alternateName: SITE_NAME, url: SITE_URL, logo: `${SITE_URL}/icon.svg`, telephone: BUSINESS_PHONE_E164, brand: { "@type": "Brand", name: SITE_NAME }, contactPoint: { "@type": "ContactPoint", telephone: BUSINESS_PHONE_E164, contactType: "homeowner inquiries", availableLanguage: "English" }, description: "Workside Software operates SellMyKernHome.com as a homeowner inquiry and lead-generation service for Bakersfield and Kern County. It is not a real estate brokerage or property buyer." },
     { "@type": "WebSite", "@id": `${SITE_URL}/#website`, name: SITE_NAME, url: SITE_URL, publisher: { "@id": `${SITE_URL}/#organization` }, inLanguage: "en-US" },
   ] };
   return <main id="main-content">
@@ -30,20 +30,20 @@ export default function HomePage() {
       <div className="hero-form-wrap"><PropertyForm compact {...form} /></div>
     </section>
 
-    <section className="reassurance"><p><strong>A useful conversation starts with the property—not pressure.</strong> Your inquiry goes to the {form.recipientTeam} for review. Share only what feels relevant now.</p></section>
+    <section className="reassurance"><p><strong>A useful conversation starts with the property—not pressure.</strong> Your inquiry goes only to {form.recipientTeam} for review. It is not currently shared with independent professionals or property buyers. Share only what feels relevant now.</p></section>
 
     <section className="section content-shell"><div className="section-heading"><div><p className="eyebrow">WHERE WE CAN START</p><h2>Situations We Can Discuss</h2></div><p>Every property comes with a different story. These guides can help you organize the facts and questions that matter before a conversation.</p></div><SituationGrid /><p className="section-link"><Link className="text-link" href="/sell-your-house-bakersfield">Compare Bakersfield home-selling options <ArrowRight size={17} /></Link></p></section>
 
     <section className="section process-section"><div className="content-shell"><div className="section-heading"><div><p className="eyebrow">HOW IT WORKS</p><h2>Three clear, unhurried steps</h2></div><p>No invented deadlines or one-size-fits-all promises—just a practical way to begin.</p></div><Process /><Link className="text-link section-link" href="/how-it-works">See what to expect <ArrowRight size={17} /></Link></div></section>
 
-    <section className="section content-shell why-grid"><div className="why-intro"><p className="eyebrow">WHY WORK WITH US</p><h2>Local context. Respectful conversation.</h2><p>We focus on understanding the property and what you want to accomplish, then communicating clearly about what may come next.</p><Link className="button button-secondary" href="/about">About this initiative</Link></div><div className="why-list">
+    <section className="section content-shell why-grid"><div className="why-intro"><p className="eyebrow">WHY START HERE</p><h2>Local context. Respectful conversation.</h2><p>We collect the property facts and what you hope to accomplish so authorized administrators can respond clearly without implying a transaction role.</p><Link className="button button-secondary" href="/about">About this service</Link></div><div className="why-list">
       <article><span>01</span><div><h3>Kern County focus</h3><p>A conversation grounded in the local property context—not a generic national script.</p></div></article>
       <article><span>02</span><div><h3>Property-specific options</h3><p>Repairs, occupancy, timing, and decision-makers all shape the discussion.</p></div></article>
       <article><span>03</span><div><h3>Clear communication</h3><p>We explain what information is needed and distinguish a conversation from a commitment.</p></div></article>
       <article><span>04</span><div><h3>Respect for your decision</h3><p>You can ask questions, seek independent advice, and decide whether to continue.</p></div></article>
     </div></section>
 
-    <section className="section about-strip"><div className="content-shell"><div className="about-mark" aria-hidden="true">K</div><div><p className="eyebrow">ABOUT SELL MY KERN HOME</p><h2>An independent seller-inquiry and property-opportunity service.</h2><p>The site helps Kern County property owners organize basic facts and request a conversation about possible property opportunities. An inquiry does not create an agency, brokerage, purchase, or other contractual relationship, and no particular price, timing, or outcome is promised.</p><Link className="text-link" href="/about">Learn about this initiative <ArrowRight size={17} /></Link></div></div></section>
+    <section className="section about-strip"><div className="content-shell"><div className="about-mark" aria-hidden="true">K</div><div><p className="eyebrow">ABOUT SELL MY KERN HOME</p><h2>A Workside-operated homeowner inquiry service.</h2><p>{OPERATOR_DISCLOSURE} An inquiry does not create an agency, brokerage, purchase, or other contractual relationship, and no particular price, timing, or outcome is promised.</p><Link className="text-link" href="/about">Learn about this service <ArrowRight size={17} /></Link></div></div></section>
 
     <section className="section content-shell faq-preview"><div><p className="eyebrow">COMMON QUESTIONS</p><h2>Useful answers before you begin</h2></div><div>{faqs.map(([question, answer]) => <details key={question}><summary>{question}</summary><p>{answer}</p></details>)}<Link className="text-link" href="/faq">View all frequently asked questions <ArrowRight size={17} /></Link></div></section>
     <CTA />

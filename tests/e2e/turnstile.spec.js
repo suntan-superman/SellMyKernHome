@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { MARKETING_NOTICE_SHA256, MARKETING_NOTICE_VERSION, PRIVACY_NOTICE_SHA256, PRIVACY_NOTICE_VERSION } from "../../lib/consent-notices.js";
 
 const testMode = process.env.TURNSTILE_TEST_MODE || "pass";
 const mockPorts = { pass: 54321, spent: 54322, fail: 54323 };
@@ -24,7 +25,10 @@ function payload(overrides = {}) {
     comments: "Isolated Turnstile verification only.",
     website: "",
     startedAt: Date.now() - 5000,
-    consentVersion: "turnstile-test-v1",
+    consentVersion: PRIVACY_NOTICE_VERSION,
+    consentNoticeHash: PRIVACY_NOTICE_SHA256,
+    marketingConsentVersion: MARKETING_NOTICE_VERSION,
+    marketingConsentNoticeHash: MARKETING_NOTICE_SHA256,
     landingUrl: "http://127.0.0.1/turnstile-test",
     referrer: "",
     utmSource: "verification",
@@ -104,7 +108,7 @@ test("widget renders and a successful form creates the correctly attributed lead
   await page.getByLabel("ZIP code").fill("93301");
   await page.getByLabel("Your name").fill("Turnstile Test");
   await page.getByLabel("Email address").fill("turnstile@example.invalid");
-  await page.getByRole("checkbox", { name: /I understand Sell My Kern Home/ }).check();
+  await page.getByRole("checkbox", { name: /I understand SellMyKernHome\.com is a homeowner inquiry/ }).check();
   await page.waitForTimeout(1600);
   await page.getByRole("button", { name: "Continue" }).click();
   const widget = page.getByRole("group", { name: "Anti-spam verification" });
@@ -148,7 +152,7 @@ test("form shows the server error and keeps the widget available for retry", asy
   await page.getByLabel("ZIP code").fill("93301");
   await page.getByLabel("Your name").fill("Turnstile Test");
   await page.getByLabel("Email address").fill("turnstile@example.invalid");
-  await page.getByRole("checkbox", { name: /I understand Sell My Kern Home/ }).check();
+  await page.getByRole("checkbox", { name: /I understand SellMyKernHome\.com is a homeowner inquiry/ }).check();
   await page.waitForTimeout(1600);
   await page.getByRole("button", { name: "Continue" }).click();
   await expect(page.getByRole("group", { name: "Anti-spam verification" })).toBeVisible();

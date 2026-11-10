@@ -22,6 +22,7 @@ test("crawl controls keep production indexing behind an explicit release gate", 
   const layout = read("app/layout.js");
   const robots = read("app/robots.js");
   const nextConfig = read("next.config.js");
+  const privacy = read("app/privacy-policy/page.js");
   assert.match(layout, /robots: indexable \? \{ index: true, follow: true \} : \{ index: false, follow: true \}/);
   assert.match(robots, /allow: "\/"/);
   assert.match(robots, /sitemap: indexable \?/);
@@ -31,6 +32,7 @@ test("crawl controls keep production indexing behind an explicit release gate", 
   }
   assert.match(nextConfig, /X-Robots-Tag/);
   assert.match(nextConfig, /noindex, nofollow, noarchive/);
+  assert.match(privacy, /path: "\/privacy-policy", indexable: false/);
 });
 test("canonical origin and sitemap are permanently domain-scoped", () => {
   assert.match(read("lib/site.js"), /https:\/\/sellmykernhome\.com/);
@@ -40,8 +42,14 @@ test("canonical origin and sitemap are permanently domain-scoped", () => {
 test("draft educational content cannot enter the sitemap", () => {
   const articles = read("content/articles.js");
   const sitemap = read("app/sitemap.js");
+  const index = read("app/insights/page.js");
+  const route = read("app/insights/[slug]/page.js");
   assert.match(articles, /approvedForIndexing: false/g);
   assert.match(sitemap, /filter\(\(article\) => article\.approvedForIndexing\)/);
+  assert.doesNotMatch(index, /articles\.map|\/insights\/\$\{article\.slug\}/);
+  assert.match(route, /export const dynamicParams = false/);
+  assert.match(route, /articles\.filter\(\(article\) => article\.approvedForIndexing\)/);
+  assert.match(route, /if \(!article\?\.approvedForIndexing\) notFound\(\)/);
 });
 test("reviewed seller landing pages are eligible only behind the master indexing gate", () => {
   const pages = read("content/seller-pages.js");
@@ -78,10 +86,33 @@ test("Bakersfield option comparison is substantive and preserves claim boundarie
   assert.doesNotMatch(pages, /close in (?:as little as )?\d|offer (?:today|within \d)|no (?:fees|commissions|closing costs)/i);
 });
 test("public role disclosures describe the approved service without implying a transaction role", () => {
-  const publicCopy = `${read("app/page.js")}\n${read("app/about/page.js")}\n${read("components/SellerLandingPage.js")}`;
-  assert.match(publicCopy, /seller-inquiry and property-opportunity service/);
-  assert.match(publicCopy, /does not represent through this website that it is a licensed brokerage, guaranteed cash buyer, or contracting party/);
+  const publicCopy = `${read("app/page.js")}\n${read("app/about/page.js")}\n${read("app/contact/page.js")}\n${read("components/PropertyForm.js")}\n${read("components/SellerLandingPage.js")}\n${read("lib/site.js")}`;
+  assert.match(publicCopy, /homeowner inquiry and lead-generation service/);
+  assert.match(publicCopy, /not a real estate brokerage or property buyer/);
+  assert.match(publicCopy, /do not represent buyers or sellers/);
   assert.match(publicCopy, /does not state that SMKH is a cash buyer, brokerage, attorney, tax adviser, or contracting party/);
+});
+test("structured data identifies Workside as operator and SMKH as its public brand", () => {
+  const homepage = read("app/page.js");
+  assert.match(homepage, /name: OPERATOR_NAME/);
+  assert.match(homepage, /alternateName: SITE_NAME/);
+  assert.match(homepage, /brand: \{ "@type": "Brand", name: SITE_NAME \}/);
+  assert.doesNotMatch(homepage, /DRE|licenseNumber|brokerage affiliation/i);
+});
+test("lead consent evidence preserves type, version, hash, timestamp, source, and choices", () => {
+  const leads = read("lib/leads.js");
+  for (const field of ["consent_type", "privacy_version", "privacy_notice_sha256", "privacy_at", "submission_source", "marketing_consent", "marketing_notice_version", "marketing_notice_sha256", "marketing_consent_at", "external_sharing_consent"]) {
+    assert.match(leads, new RegExp(field));
+  }
+  assert.match(leads, /external_sharing_consent: false/);
+});
+test("Merxus prompt is limited to first-party lead intake", () => {
+  const prompt = read("docs/Merxus_AI_Prompt/Prompt.md");
+  assert.match(prompt, /AI assistant helping collect homeowner inquiries for Workside Software/);
+  assert.match(prompt, /not a real estate brokerage or property buyer/);
+  assert.match(prompt, /does not authorize call recording or transcription/);
+  assert.match(prompt, /Do not request permission for external sharing/);
+  assert.doesNotMatch(prompt, /property acquisition service|our acquisition team/i);
 });
 test("homepage uses the approved homeowner brand message and preserves local conversion paths", () => {
   const homepage = read("app/page.js");
