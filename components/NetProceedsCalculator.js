@@ -113,14 +113,17 @@ export default function NetProceedsCalculator() {
         <div><span>Repair and list</span><span className={`result-bar ${result.repairAndListNet < 0 ? "result-bar-negative" : ""}`} style={{ width: repairBarWidth }} /></div>
         <div><span>Sell as-is</span><span className={`result-bar result-bar-alt ${result.asIsNet < 0 ? "result-bar-negative" : ""}`} style={{ width: asIsBarWidth }} /></div>
       </div>
-      <div className="calculation-breakdowns">
-        <article><h3>Repair-and-list calculation</h3><ul><LineItem label="Expected sale price" cents={result.repairAndList.salePrice} /><LineItem label="Repair budget" cents={result.repairAndList.repairBudget} subtraction /><LineItem label="Selling expenses" cents={result.repairAndList.sellingExpenses} subtraction /><LineItem label="Carrying costs" cents={result.repairAndList.carryingCosts} subtraction /><LineItem label="Mortgage and lien payoff" cents={result.repairAndList.mortgagePayoff} subtraction /><LineItem label="Estimated proceeds" cents={result.repairAndListNet} total /></ul></article>
-        <article><h3>As-is calculation</h3><ul><LineItem label="Hypothetical sale price" cents={result.asIs.salePrice} /><LineItem label="Selling expenses" cents={result.asIs.sellingExpenses} subtraction /><LineItem label="Carrying costs" cents={result.asIs.carryingCosts} subtraction /><LineItem label="Mortgage and lien payoff" cents={result.asIs.mortgagePayoff} subtraction /><LineItem label="Estimated proceeds" cents={result.asIsNet} total /></ul></article>
-      </div>
       <p className="calculator-insight"><strong>Why net proceeds matter:</strong> A higher selling price does not necessarily produce a higher net result after repairs, selling expenses, carrying costs, and payoffs.</p>
+      <p className="calculator-disclaimer">This calculator provides hypothetical estimates based on the numbers you enter. It is not an appraisal, purchase offer, guarantee, or real estate, legal, tax, or financial advice. Actual proceeds depend on the property, transaction terms, closing costs, taxes, liens, and other expenses. Selling expenses, including real estate commissions, are negotiable.</p>
       <div className="calculator-actions"><button className="button button-secondary print-button" type="button" onClick={() => window.print()}><Printer size={17} /> Print Summary</button><Link className="button" href="/#property-form" data-analytics-event="calculator_cta_click" data-analytics-location="net_proceeds_results">Want to explore your selling options? Tell us about your property.</Link></div>
       <p className="no-obligation">No obligation to sell.</p>
+      <details className="calculation-details">
+        <summary>View calculation details</summary>
+        <div className="calculation-breakdowns">
+          <article><h3>Repair-and-list calculation</h3><ul><LineItem label="Expected sale price" cents={result.repairAndList.salePrice} /><LineItem label="Repair budget" cents={result.repairAndList.repairBudget} subtraction /><LineItem label="Selling expenses" cents={result.repairAndList.sellingExpenses} subtraction /><LineItem label="Carrying costs" cents={result.repairAndList.carryingCosts} subtraction /><LineItem label="Mortgage and lien payoff" cents={result.repairAndList.mortgagePayoff} subtraction /><LineItem label="Estimated proceeds" cents={result.repairAndListNet} total /></ul></article>
+          <article><h3>As-is calculation</h3><ul><LineItem label="Hypothetical sale price" cents={result.asIs.salePrice} /><LineItem label="Selling expenses" cents={result.asIs.sellingExpenses} subtraction /><LineItem label="Carrying costs" cents={result.asIs.carryingCosts} subtraction /><LineItem label="Mortgage and lien payoff" cents={result.asIs.mortgagePayoff} subtraction /><LineItem label="Estimated proceeds" cents={result.asIsNet} total /></ul></article>
+        </div>
+      </details>
     </div>
-    <p className="calculator-disclaimer">This calculator provides hypothetical estimates based on the numbers you enter. It is not an appraisal, purchase offer, guarantee, or real estate, legal, tax, or financial advice. Actual proceeds depend on the property, transaction terms, closing costs, taxes, liens, and other expenses. Selling expenses, including real estate commissions, are negotiable.</p>
   </section>;
 }
