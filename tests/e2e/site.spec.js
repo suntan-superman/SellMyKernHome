@@ -18,6 +18,7 @@ test("homepage, navigation, and seller form are accessible", async ({ page }) =>
   await expect(latestGuide).toBeVisible();
   await expect(latestGuide).toHaveAttribute("href", "/insights/sell-as-is-or-repair-bakersfield");
   await expect(page.getByRole("link", { name: "View all homeowner guides" })).toHaveAttribute("href", "/insights");
+  await expect(page.getByRole("link", { name: "Take the Selling Options Quiz" })).toHaveAttribute("href", "/tools/which-selling-option-fits-me");
   await expect(page.getByText("No obligation to sell.", { exact: true })).toBeVisible();
   const heroImage = page.locator('.hero-visual img[src*="craftsman-home-exterior-v2"]');
   await expect(heroImage).toBeVisible();
@@ -71,7 +72,7 @@ test("phone contact formats as a US number and uses the brand radio accent", asy
 });
 
 test("required public routes return useful pages", async ({ page }) => {
-  for (const route of ["/how-it-works","/selling-situations","/sell-your-house-bakersfield","/sell-house-as-is-bakersfield","/sell-inherited-house-bakersfield","/sell-house-needs-repairs-bakersfield","/sell-rental-property-bakersfield","/selling-situations/vacant-property","/selling-situations/relocating","/about","/faq","/contact","/privacy-policy","/privacy-choices","/terms","/insights"]) {
+  for (const route of ["/how-it-works","/selling-situations","/sell-your-house-bakersfield","/sell-house-as-is-bakersfield","/sell-inherited-house-bakersfield","/sell-house-needs-repairs-bakersfield","/sell-rental-property-bakersfield","/selling-situations/vacant-property","/selling-situations/relocating","/about","/faq","/contact","/privacy-policy","/privacy-choices","/terms","/insights","/tools/which-selling-option-fits-me"]) {
     const response = await page.goto(route); expect(response.ok(), route).toBeTruthy(); await expect(page.locator("h1")).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow, `${route} horizontal overflow`).toBeLessThanOrEqual(1);
@@ -82,7 +83,7 @@ test("the approved as-is article is public while the other drafts remain inacces
   const approved = "sell-as-is-or-repair-bakersfield";
   const drafts = ["selling-inherited-property-kern-county", "options-when-house-needs-major-repairs", "questions-before-signing-property-purchase-agreement"];
   await page.goto("/insights");
-  await expect(page.locator(`a[href="/insights/${approved}"]`)).toBeVisible();
+  await expect(page.locator(`a[href="/insights/${approved}"]`).first()).toBeVisible();
   const articleResponse = await page.goto(`/insights/${approved}`);
   expect(articleResponse.ok()).toBeTruthy();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Sell As-Is or Make Repairs? A Bakersfield Homeowner's Guide");
@@ -136,12 +137,68 @@ test("net proceeds calculator updates, resets, and remains responsive", async ({
   await definitions.press("Enter");
   await expect(page.getByRole("heading", { name: "Selling expenses" })).toBeVisible();
   await expect(page.getByText(/homeowner inquiry and lead-generation service operated by Workside Software/i).first()).toBeVisible();
-  for (const href of ["/insights/sell-as-is-or-repair-bakersfield", "/sell-house-as-is-bakersfield", "/sell-your-house-bakersfield", "/contact"]) await expect(page.locator(`.calculator-related a[href="${href}"]`)).toBeVisible();
+  for (const href of ["/tools/which-selling-option-fits-me", "/insights/sell-as-is-or-repair-bakersfield", "/sell-house-as-is-bakersfield", "/sell-your-house-bakersfield", "/contact"]) await expect(page.locator(`.calculator-related a[href="${href}"]`)).toBeVisible();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
   const results = await new AxeBuilder({ page }).include(".calculator-shell").withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   const blocking = results.violations.filter((item) => ["serious", "critical"].includes(item.impact));
   expect(blocking, JSON.stringify(blocking, null, 2)).toEqual([]);
+});
+
+test("selling options quiz supports navigation, restart, results, and optional form context", async ({ page }) => {
+  const response = await page.goto("/tools/which-selling-option-fits-me");
+  expect(response.ok()).toBeTruthy();
+  await expect(page).toHaveTitle("Which Home Selling Option Fits Me? | Bakersfield CA");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Which Selling Option Fits Me?");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://sellmykernhome.com/tools/which-selling-option-fits-me");
+  expect(await page.locator('script[type="application/ld+json"]').first().textContent()).toContain("WebApplication");
+  await expect(page.getByRole("button", { name: "Next", exact: true })).toBeDisabled();
+
+  const completeQuiz = async () => {
+    await page.getByRole("radio", { name: "Move-in ready" }).check();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
+    await page.getByRole("radio", { name: "As soon as practical" }).check();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
+    await page.getByRole("button", { name: /Back/ }).click();
+    await page.getByRole("radio", { name: "Within 3–6 months" }).check();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
+    await page.getByRole("radio", { name: "No", exact: true }).check();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
+    await page.getByRole("radio", { name: "Owner occupied" }).check();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
+    await page.getByRole("radio", { name: "No known mortgage or liens" }).check();
+    await page.getByRole("button", { name: "Next", exact: true }).click();
+    await page.getByRole("radio", { name: "Maximizing potential sale price" }).check();
+    await page.getByRole("button", { name: "See My Results" }).click();
+    await expect(page.getByRole("heading", { name: "Traditional listing may be worth exploring" })).toBeVisible();
+  };
+
+  await completeQuiz();
+  expect(await page.evaluate(() => window.sessionStorage.getItem("smkh_selling_quiz_context"))).toBeNull();
+  await page.getByRole("button", { name: "Restart quiz" }).click();
+  await expect(page.getByText("Question 1 of 6")).toBeVisible();
+  await completeQuiz();
+  await page.getByRole("checkbox", { name: "Include my quiz answers with my inquiry." }).check();
+  const summary = page.getByLabel("Review or edit the summary before continuing");
+  await expect(summary).toHaveValue(/Move-in ready/);
+  await summary.fill(`${await summary.inputValue()}\nHomeowner note: compare written options.`);
+  await page.locator(".quiz-results .quiz-actions").getByRole("link", { name: "Tell Us About Your Property" }).click();
+  await expect(page).toHaveURL(/\/#property-form$/);
+  expect(page.url()).not.toContain("Move-in");
+  await page.getByLabel("Property street address").fill("123 Test Street");
+  await page.getByLabel("City").fill("Bakersfield");
+  await page.getByLabel("ZIP code").fill("93301");
+  await page.getByLabel("Your name").fill("Synthetic Seller");
+  await page.getByLabel("Email address").fill("seller@example.test");
+  await page.getByRole("checkbox", { name: /I acknowledge the Privacy Policy/ }).check();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await expect(page.getByLabel("Selling options quiz summary")).toHaveValue(/Homeowner note: compare written options\./);
+  await page.getByRole("button", { name: "Remove quiz summary" }).click();
+  await expect(page.getByLabel("Selling options quiz summary")).toHaveCount(0);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+  const results = await new AxeBuilder({ page }).include("#property-form").withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  expect(results.violations.filter((item) => ["serious", "critical"].includes(item.impact))).toEqual([]);
 });
 
 test("Bakersfield selling-path comparison is readable and accessible", async ({ page }) => {

@@ -7,7 +7,7 @@ const root = path.resolve(import.meta.dirname, "..");
 const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 
 test("all required public routes exist", () => {
-  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/privacy-choices/page.js","app/terms/page.js","app/thank-you/page.js","app/tools/home-sale-net-proceeds-calculator/page.js"];
+  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/privacy-choices/page.js","app/terms/page.js","app/thank-you/page.js","app/tools/home-sale-net-proceeds-calculator/page.js","app/tools/which-selling-option-fits-me/page.js"];
   for (const route of routes) assert.equal(fs.existsSync(path.join(root, route)), true, route);
 });
 test("admin login provides an accessible password visibility control", () => {
@@ -93,6 +93,30 @@ test("net proceeds calculator is indexable, linked, structured, and non-persiste
   assert.match(sitemap, /\/tools\/home-sale-net-proceeds-calculator/);
   for (const source of [article, sellerPages, insights]) assert.match(source, /\/tools\/home-sale-net-proceeds-calculator/);
   assert.doesNotMatch(calculator, /fetch\(|localStorage|sessionStorage|supabase|email/i);
+});
+test("selling options quiz is indexable, linked, private by default, and structured", () => {
+  const page = read("app/tools/which-selling-option-fits-me/page.js");
+  const quiz = read("components/SellingOptionsQuiz.js");
+  const rules = read("lib/selling-quiz.js");
+  const form = read("components/PropertyForm.js");
+  const sitemap = read("app/sitemap.js");
+  const homepage = read("app/page.js");
+  const situations = read("app/selling-situations/page.js");
+  const calculator = read("app/tools/home-sale-net-proceeds-calculator/page.js");
+  const insights = read("app/insights/page.js");
+  assert.match(page, /Which Home Selling Option Fits Me\? \| Bakersfield CA/);
+  assert.match(page, /path = "\/tools\/which-selling-option-fits-me"/);
+  assert.match(page, /"@type": "WebApplication"/);
+  assert.match(page, /<SellingOptionsQuiz \/>/);
+  assert.match(quiz, /Include my quiz answers with my inquiry/);
+  assert.match(quiz, /window\.sessionStorage\.setItem\(SELLING_QUIZ_CONTEXT_KEY/);
+  assert.doesNotMatch(quiz, /fetch\(|supabase|localStorage|URLSearchParams/);
+  assert.match(form, /Selling options quiz summary/);
+  assert.match(form, /window\.sessionStorage\.removeItem\(SELLING_QUIZ_CONTEXT_KEY\)/);
+  assert.match(rules, /if \(answers\.inheritance === "resolving" \|\| answers\.inheritance === "unsure"\)/);
+  assert.match(rules, /return \{ key: "compare"/);
+  assert.match(sitemap, /\/tools\/which-selling-option-fits-me/);
+  for (const source of [homepage, situations, calculator, insights]) assert.match(source, /\/tools\/which-selling-option-fits-me/);
 });
 test("reviewed seller landing pages are eligible only behind the master indexing gate", () => {
   const pages = read("content/seller-pages.js");
@@ -283,6 +307,14 @@ test("calculator analytics are consent-gated and never include financial inputs"
   assert.match(calculator, /data-analytics-event="calculator_cta_click"/);
   assert.doesNotMatch(calculator, /track\([^\n]*(?:salePrice|repairBudget|mortgagePayoff|sellingExpense)/);
   assert.doesNotMatch(analytics, /"sale_price"|"mortgage"|"repair_budget"|"financial_value"/);
+});
+test("selling quiz analytics are consent-gated and contain no answer values", () => {
+  const analytics = read("lib/analytics.js");
+  const quiz = read("components/SellingOptionsQuiz.js");
+  for (const event of ["selling_quiz_start", "selling_quiz_complete", "selling_quiz_cta_click"]) assert.match(analytics, new RegExp(event));
+  assert.match(quiz, /track\("selling_quiz_start", \{ location: "selling_options_quiz" \}\)/);
+  assert.match(quiz, /track\("selling_quiz_complete", \{ location: "selling_options_quiz" \}\)/);
+  assert.doesNotMatch(quiz, /track\([^\n]*(?:condition|timeline|inheritance|occupancy|mortgage|priority)/);
 });
 test("seller funnel uses the approved non-PII event taxonomy", () => {
   const form = read("components/PropertyForm.js");

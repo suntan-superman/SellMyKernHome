@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Check, LoaderCircle, LockKeyhole } from "lucide-react";
 import { track } from "@/lib/analytics";
@@ -18,6 +18,7 @@ import {
 import { PARTNER_DELIVERY_DISABLED_TEXT, SHORT_DISCLOSURE_TEXT } from "@/lib/disclosures";
 import { BUSINESS_PHONE_DISPLAY, BUSINESS_PHONE_SERVICE_LABEL } from "@/lib/site";
 import { formatPhoneNumber } from "@/lib/validation";
+import { SELLING_QUIZ_CONTEXT_KEY } from "@/lib/selling-quiz";
 import PhoneLink from "./PhoneLink";
 import TurnstileWidget from "./TurnstileWidget";
 
@@ -64,6 +65,12 @@ export default function PropertyForm({ compact = false, initialAddress = "", tur
   const [busy, setBusy] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [turnstileResetSignal, setTurnstileResetSignal] = useState(0);
+  const [quizContext, setQuizContext] = useState("");
+
+  useEffect(() => {
+    const stored = window.sessionStorage.getItem(SELLING_QUIZ_CONTEXT_KEY);
+    if (stored) setQuizContext(stored.slice(0, 800));
+  }, []);
 
   function resetTurnstile() {
     setTurnstileToken("");
@@ -99,10 +106,12 @@ export default function PropertyForm({ compact = false, initialAddress = "", tur
     if (!validateFirstStep()) { setStep(1); track("seller_form_validation_error", { form: "seller_inquiry", step: 1, error_count: Object.keys(firstStepErrors(data)).length }); return; }
     setBusy(true); setMessage("");
     try {
+      const comments = [data.comments.trim(), quizContext.trim() ? `Selling options quiz summary:\n${quizContext.trim()}` : ""].filter(Boolean).join("\n\n");
       const response = await fetch("/api/leads", {
         method: "POST", headers: { "content-type": "application/json" },
         body: JSON.stringify({
           ...data,
+          comments,
           ...getAttribution(),
           turnstileToken,
           submissionToken: submissionToken.current,
@@ -125,6 +134,7 @@ export default function PropertyForm({ compact = false, initialAddress = "", tur
       }
       track("seller_form_submit_success", { form: "seller_inquiry" });
       if (!result.duplicate) track("generate_lead", { form: "seller_inquiry", source: "seller_web" });
+      window.sessionStorage.removeItem(SELLING_QUIZ_CONTEXT_KEY);
       router.push("/thank-you");
     } catch {
       setMessage("We could not connect. Please check your connection and try again.");
@@ -155,7 +165,8 @@ export default function PropertyForm({ compact = false, initialAddress = "", tur
       <div><label htmlFor="condition">Approximate condition <span>Optional</span></label><select id="condition" name="condition" value={data.condition} onChange={update}><option value="">Choose one</option><option>Move-in ready</option><option>Minor updates needed</option><option>Significant repairs needed</option><option>Unsure</option></select></div>
       <div><label htmlFor="occupancy">Occupancy <span>Optional</span></label><select id="occupancy" name="occupancy" value={data.occupancy} onChange={update}><option value="">Choose one</option><option>Owner occupied</option><option>Tenant occupied</option><option>Vacant</option><option>Other</option></select></div>
       <div><label htmlFor="timing">Desired timing <span>Optional</span></label><select id="timing" name="timing" value={data.timing} onChange={update}><option value="">Choose one</option><option>Exploring options</option><option>Within 30 days</option><option>1–3 months</option><option>3+ months</option><option>Unsure</option></select></div>
-      <div className="field-wide"><label htmlFor="comments">What would be helpful for us to know? <span>Optional</span></label><textarea id="comments" name="comments" rows="4" maxLength="2000" value={data.comments} onChange={update} /><small>Do not include bank, mortgage, access-code, or other sensitive information.</small></div>
+      {quizContext ? <div className="field-wide quiz-context-field"><label htmlFor="quizContext">Selling options quiz summary <span>Optional</span></label><textarea id="quizContext" rows="7" maxLength="800" value={quizContext} onChange={(event) => setQuizContext(event.target.value)} /><div><small>Review or edit this summary. It is included only if you submit this form.</small><button type="button" onClick={() => { setQuizContext(""); window.sessionStorage.removeItem(SELLING_QUIZ_CONTEXT_KEY); }}>Remove quiz summary</button></div></div> : null}
+      <div className="field-wide"><label htmlFor="comments">What would be helpful for us to know? <span>Optional</span></label><textarea id="comments" name="comments" rows="4" maxLength={quizContext ? 1000 : 2000} value={data.comments} onChange={update} /><small>Do not include bank, mortgage, access-code, or other sensitive information.</small></div>
       <div className="field-wide consent-choice-group">
         <label className="check-field"><input type="checkbox" name="sharingConsent" checked={data.sharingConsent} onChange={update} disabled={!sharingAvailable} aria-invalid={Boolean(errors.sharingConsent)} aria-describedby={describedBy("sharingConsent")} /><span>{SHARING_NOTICE_TEXT}</span></label>{fieldError("sharingConsent")}
         {sharingAvailable ? <p className="consent-recipient-list"><strong>Approved recipients:</strong> {approvedSharingRecipients.map((recipient) => recipient.name).join(", ")}.</p> : <p className="consent-unavailable"><strong>Not currently available:</strong> {PARTNER_DELIVERY_DISABLED_TEXT}</p>}
