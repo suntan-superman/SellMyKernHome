@@ -124,14 +124,85 @@ nav {
   align-items: center;
   gap: 26px;
 }
-nav > a:not(.button) {
+nav > a:not(.button),
+.nav-dropdown-toggle {
   font-size: 0.86rem;
   font-weight: 600;
   text-decoration: none;
 }
-nav > a:not(.button):hover {
+nav > a:not(.button):hover,
+.nav-dropdown-toggle:hover {
   text-decoration: underline;
   text-underline-offset: 6px;
+}
+.nav-dropdown {
+  position: relative;
+}
+.nav-dropdown-toggle {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  font-family: inherit;
+  cursor: pointer;
+}
+.nav-dropdown-toggle svg {
+  transition: transform 0.16s ease;
+}
+.nav-dropdown-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+.nav-dropdown-toggle:focus-visible {
+  outline: 3px solid #c6a56c;
+  outline-offset: 4px;
+  border-radius: 3px;
+}
+.nav-submenu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: -18px;
+  z-index: 60;
+  display: grid;
+  width: 285px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
+  padding: 9px;
+  box-shadow: 0 18px 45px rgba(25, 51, 45, 0.16);
+}
+.nav-submenu[hidden] {
+  display: none;
+}
+.nav-submenu a {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  border-radius: 8px;
+  color: var(--ink);
+  padding: 9px 11px;
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1.25;
+  text-decoration: none;
+}
+.nav-submenu a:hover,
+.nav-submenu a:focus-visible {
+  background: var(--sage-light);
+  color: var(--forest);
+}
+.nav-submenu-label {
+  margin: 5px 11px 2px;
+  border-top: 1px solid var(--line);
+  padding-top: 9px;
+  color: var(--brass);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 .menu-button {
   display: none;
@@ -1500,6 +1571,26 @@ summary:focus-visible {
   }
   .site-header nav > a {
     padding: 7px;
+  }
+  .site-header nav .nav-dropdown {
+    width: 100%;
+  }
+  .site-header nav .nav-dropdown-toggle {
+    width: 100%;
+    justify-content: space-between;
+    padding: 7px;
+    text-align: left;
+  }
+  .site-header nav .nav-submenu {
+    position: static;
+    width: 100%;
+    margin: 2px 0 7px;
+    border-radius: 10px;
+    box-shadow: none;
+  }
+  .site-header nav .nav-submenu a {
+    padding-right: 13px;
+    padding-left: 13px;
   }
   .site-header .nav-cta {
     display: inline-flex;

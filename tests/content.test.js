@@ -54,7 +54,11 @@ test("only the approved as-is article can enter the sitemap", () => {
   assert.match(index, /<ArticleCards \/>/);
   assert.match(cards, /filter\(\(article\) => article\.approvedForIndexing\)/);
   assert.match(homepage, /<ArticleCards limit=\{3\} \/>/);
-  assert.match(header, /\["\/insights", "Insights"\]/);
+  assert.match(index, /id="articles"/);
+  for (const href of ["/insights", "/insights#articles", "/tools/home-carrying-cost-calculator", "/tools/home-sale-net-proceeds-calculator", "/tools/which-selling-option-fits-me"]) assert.match(header, new RegExp(href.replace(/[/?]/g, "\\$&")));
+  assert.match(header, /aria-controls="insights-navigation-menu"/);
+  assert.match(header, /aria-expanded=\{insightsOpen\}/);
+  assert.match(header, /event\.key !== "Escape"/);
   assert.match(route, /export const dynamicParams = false/);
   assert.match(route, /articles\.filter\(\(article\) => article\.approvedForIndexing\)/);
   assert.match(route, /if \(!article\?\.approvedForIndexing\) notFound\(\)/);
@@ -237,7 +241,8 @@ test("homepage uses the approved homeowner brand message and preserves local con
   assert.match(homepage, /href="\/tools\/home-sale-net-proceeds-calculator"/);
   assert.match(homepage, /data-analytics-event="calculator_cta_click"/);
   const header = read("components/Header.js");
-  assert.match(header, /\["\/tools\/home-sale-net-proceeds-calculator", "Calculator"\]/);
+  assert.match(header, /\["\/tools\/home-sale-net-proceeds-calculator", "Net Proceeds Calculator"\]/);
+  assert.doesNotMatch(header, /\["\/tools\/home-sale-net-proceeds-calculator", "Calculator"\]/);
 });
 test("homepage and social metadata use the optimized Craftsman hero image", () => {
   const homepage = read("app/page.js");

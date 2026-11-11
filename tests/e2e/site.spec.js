@@ -12,8 +12,11 @@ test("homepage, navigation, and seller form are accessible", async ({ page }) =>
   const calculatorCta = page.getByRole("link", { name: "Use the Free Net Proceeds Calculator" });
   await expect(calculatorCta).toBeVisible();
   await expect(calculatorCta).toHaveAttribute("href", "/tools/home-sale-net-proceeds-calculator");
-  await expect(page.locator('#primary-navigation a[href="/tools/home-sale-net-proceeds-calculator"]')).toHaveText("Calculator");
-  await expect(page.locator('#primary-navigation a[href="/insights"]')).toHaveText("Insights");
+  const insightsToggle = page.locator("#insights-navigation-button");
+  await expect(insightsToggle).toHaveAttribute("aria-expanded", "false");
+  await expect(insightsToggle).toHaveAttribute("aria-controls", "insights-navigation-menu");
+  await expect(page.locator('#insights-navigation-menu a[href="/tools/home-sale-net-proceeds-calculator"]')).toHaveText("Net Proceeds Calculator");
+  await expect(page.locator('#insights-navigation-menu a[href="/tools/home-carrying-cost-calculator"]')).toHaveText("Carrying Costs Calculator");
   const latestGuide = page.getByRole("link", { name: "Sell As-Is or Make Repairs? A Bakersfield Homeowner's Guide" }).first();
   await expect(latestGuide).toBeVisible();
   await expect(latestGuide).toHaveAttribute("href", "/insights/sell-as-is-or-repair-bakersfield");
@@ -49,11 +52,53 @@ test("expanded primary navigation fits before the mobile breakpoint", async ({ p
   await page.goto("/");
   const navigation = page.locator("#primary-navigation");
   await expect(navigation).toBeVisible();
-  await expect(navigation.getByRole("link", { name: "Insights", exact: true })).toBeVisible();
+  await expect(navigation.getByRole("button", { name: "Insights", exact: true })).toBeVisible();
   const [navigationBox, shellBox, logoBox, actionsBox] = await Promise.all([navigation.boundingBox(), page.locator(".nav-shell").boundingBox(), page.locator(".site-header .logo").boundingBox(), page.locator(".header-actions").boundingBox()]);
   expect(navigationBox.x).toBeGreaterThanOrEqual(shellBox.x);
   expect(navigationBox.x + navigationBox.width).toBeLessThanOrEqual(shellBox.x + shellBox.width + 1);
   expect(logoBox.x + logoBox.width).toBeLessThanOrEqual(actionsBox.x);
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+});
+
+test("Insights disclosure navigation is keyboard and mobile accessible", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/");
+  const toggle = page.getByRole("button", { name: "Insights", exact: true });
+  const submenu = page.locator("#insights-navigation-menu");
+  await expect(submenu).toBeHidden();
+  await toggle.focus();
+  await toggle.press("Enter");
+  await expect(toggle).toHaveAttribute("aria-expanded", "true");
+  await expect(submenu).toBeVisible();
+  await expect(submenu.getByRole("link")).toHaveText(["Overview", "Articles", "Carrying Costs Calculator", "Net Proceeds Calculator", "Best Selling Options Quiz"]);
+  const desktopAccessibility = await new AxeBuilder({ page }).include(".site-header").withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  expect(desktopAccessibility.violations.filter((item) => ["serious", "critical"].includes(item.impact))).toEqual([]);
+  await page.keyboard.press("Escape");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(toggle).toBeFocused();
+  await toggle.press("Space");
+  await expect(submenu).toBeVisible();
+  await page.locator("main").click({ position: { x: 5, y: 5 } });
+  await expect(submenu).toBeHidden();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
+  await page.getByRole("button", { name: "Open menu" }).click();
+  const mobileToggle = page.getByRole("button", { name: "Insights", exact: true });
+  await expect(mobileToggle).toBeVisible();
+  await mobileToggle.click();
+  await expect(submenu).toBeVisible();
+  for (const link of await submenu.getByRole("link").all()) {
+    const box = await link.boundingBox();
+    expect(box.height).toBeGreaterThanOrEqual(44);
+  }
+  const mobileAccessibility = await new AxeBuilder({ page }).include(".site-header").withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  expect(mobileAccessibility.violations.filter((item) => ["serious", "critical"].includes(item.impact))).toEqual([]);
+  await submenu.getByRole("link", { name: "Articles", exact: true }).click();
+  await expect(page).toHaveURL(/\/insights#articles$/);
+  await expect(page.locator("#articles")).toBeVisible();
+  await expect(page.locator("#primary-navigation")).not.toHaveClass(/nav-open/);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
 });
