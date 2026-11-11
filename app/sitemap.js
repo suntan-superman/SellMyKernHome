@@ -2,7 +2,7 @@ import { articles } from "@/content/articles";
 import { sellerPages } from "@/content/seller-pages";
 import { SITE_URL, isIndexingEnabled } from "@/lib/site";
 
-const coreRoutes = ["", "/how-it-works", "/selling-situations", "/about", "/faq", "/contact", "/insights", "/tools/home-sale-net-proceeds-calculator", "/tools/which-selling-option-fits-me", "/selling-situations/vacant-property", "/selling-situations/relocating"];
+const coreRoutes = ["", "/how-it-works", "/selling-situations", "/about", "/faq", "/contact", "/insights", "/tools/home-sale-net-proceeds-calculator", "/tools/home-carrying-cost-calculator", "/tools/which-selling-option-fits-me", "/selling-situations/vacant-property", "/selling-situations/relocating"];
 
 export default function sitemap() {
   if (!isIndexingEnabled()) return [];

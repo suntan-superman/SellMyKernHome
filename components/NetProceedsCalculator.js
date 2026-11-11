@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Printer, RotateCcw } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { track } from "@/lib/analytics";
+import { CARRYING_COST_TRANSFER_KEY } from "@/lib/carrying-costs";
 import {
   DEFAULT_NET_PROCEEDS_INPUTS,
   calculateNetProceeds,
@@ -45,6 +46,7 @@ function LineItem({ label, cents, subtraction = false, total = false }) {
 
 export default function NetProceedsCalculator() {
   const [values, setValues] = useState(DEFAULT_NET_PROCEEDS_INPUTS);
+  const [transferNotice, setTransferNotice] = useState(null);
   const viewTracked = useRef(false);
   const interactionTracked = useRef(false);
   const result = useMemo(() => calculateNetProceeds(values), [values]);
@@ -53,6 +55,22 @@ export default function NetProceedsCalculator() {
     if (viewTracked.current) return;
     viewTracked.current = true;
     track("calculator_view", { location: "net_proceeds_calculator" });
+  }, []);
+
+  useEffect(() => {
+    const stored = window.sessionStorage.getItem(CARRYING_COST_TRANSFER_KEY);
+    if (!stored) return;
+    window.sessionStorage.removeItem(CARRYING_COST_TRANSFER_KEY);
+    try {
+      const transfer = JSON.parse(stored);
+      const amountCents = Number(transfer.amountCents);
+      if (!Number.isSafeInteger(amountCents) || amountCents < 0 || amountCents > currencyMaximum * 100 || !["repair", "asIs"].includes(transfer.scenario)) return;
+      const field = transfer.scenario === "repair" ? "repairCarryingCosts" : "asIsCarryingCosts";
+      setValues((current) => ({ ...current, [field]: String(amountCents / 100) }));
+      setTransferNotice({ amountCents, scenario: transfer.scenario });
+    } catch {
+      // Ignore malformed browser-session data and retain the published defaults.
+    }
   }, []);
 
   function update(field, value) {
@@ -65,6 +83,8 @@ export default function NetProceedsCalculator() {
 
   function resetExample() {
     setValues({ ...DEFAULT_NET_PROCEEDS_INPUTS });
+    setTransferNotice(null);
+    window.sessionStorage.removeItem(CARRYING_COST_TRANSFER_KEY);
   }
 
   const winner = result.difference > 0
@@ -81,6 +101,7 @@ export default function NetProceedsCalculator() {
       <div><p className="eyebrow">HYPOTHETICAL EXAMPLE</p><h2 id="calculator-title">Compare your assumptions</h2><p>Change any number below. Your entries stay in this browser page and are not submitted or saved.</p></div>
       <button className="button button-secondary calculator-reset" type="button" onClick={resetExample}><RotateCcw size={17} /> Reset Example</button>
     </div>
+    {transferNotice ? <div className="calculator-transfer-notice" role="status"><span><strong>Carrying cost imported:</strong> {formatUsd(transferNotice.amountCents)} was applied to {transferNotice.scenario === "repair" ? "Repair and list" : "Sell as-is"}. You can edit the amount below or reset the example.</span><button type="button" onClick={() => setTransferNotice(null)}>Dismiss</button></div> : null}
     <div className="calculator-scenarios">
       <fieldset className="calculator-card">
         <legend><span>Scenario A</span>Repair and list</legend>

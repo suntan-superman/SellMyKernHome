@@ -72,7 +72,7 @@ test("phone contact formats as a US number and uses the brand radio accent", asy
 });
 
 test("required public routes return useful pages", async ({ page }) => {
-  for (const route of ["/how-it-works","/selling-situations","/sell-your-house-bakersfield","/sell-house-as-is-bakersfield","/sell-inherited-house-bakersfield","/sell-house-needs-repairs-bakersfield","/sell-rental-property-bakersfield","/selling-situations/vacant-property","/selling-situations/relocating","/about","/faq","/contact","/privacy-policy","/privacy-choices","/terms","/insights","/tools/which-selling-option-fits-me"]) {
+  for (const route of ["/how-it-works","/selling-situations","/sell-your-house-bakersfield","/sell-house-as-is-bakersfield","/sell-inherited-house-bakersfield","/sell-house-needs-repairs-bakersfield","/sell-rental-property-bakersfield","/selling-situations/vacant-property","/selling-situations/relocating","/about","/faq","/contact","/privacy-policy","/privacy-choices","/terms","/insights","/tools/home-carrying-cost-calculator","/tools/which-selling-option-fits-me"]) {
     const response = await page.goto(route); expect(response.ok(), route).toBeTruthy(); await expect(page.locator("h1")).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow, `${route} horizontal overflow`).toBeLessThanOrEqual(1);
@@ -198,6 +198,54 @@ test("selling options quiz supports navigation, restart, results, and optional f
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
   const results = await new AxeBuilder({ page }).include("#property-form").withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+  expect(results.violations.filter((item) => ["serious", "critical"].includes(item.impact))).toEqual([]);
+});
+
+test("carrying cost calculator calculates, resets, and transfers one selected scenario", async ({ page }) => {
+  const response = await page.goto("/tools/home-carrying-cost-calculator");
+  expect(response.ok()).toBeTruthy();
+  await expect(page).toHaveTitle("Home Carrying Cost Calculator | Bakersfield & Kern County");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Home Carrying Cost Calculator");
+  await expect(page.getByTestId("monthly-carrying-total")).toHaveText("$2,650.00");
+  await expect(page.getByTestId("holding-cost-total")).toHaveText("$15,900.00");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://sellmykernhome.com/tools/home-carrying-cost-calculator");
+  expect(await page.locator('script[type="application/ld+json"]').first().textContent()).toContain("WebApplication");
+  const transferButton = page.getByRole("button", { name: "Use These Costs in Net Proceeds Calculator" });
+  await expect(transferButton).toBeDisabled();
+  expect(await page.evaluate(() => window.sessionStorage.getItem("smkh_carrying_cost_transfer"))).toBeNull();
+
+  await page.getByRole("spinbutton", { name: "Monthly mortgage payment", exact: true }).fill("0");
+  await expect(page.getByTestId("monthly-carrying-total")).toHaveText("$850.00");
+  await page.getByRole("spinbutton", { name: "Holding period in months", exact: true }).fill("12");
+  await expect(page.getByTestId("holding-cost-total")).toHaveText("$10,200.00");
+  await page.getByRole("spinbutton", { name: "Monthly property taxes", exact: true }).fill("-25");
+  await expect(page.getByRole("spinbutton", { name: "Monthly property taxes", exact: true })).toHaveValue("0");
+  await page.getByRole("button", { name: "Reset Example" }).click();
+  await expect(page.getByTestId("monthly-carrying-total")).toHaveText("$2,650.00");
+  await expect(page.getByTestId("holding-cost-total")).toHaveText("$15,900.00");
+
+  await page.getByRole("radio", { name: "Repair and list" }).check();
+  await expect(transferButton).toBeEnabled();
+  await transferButton.click();
+  await expect(page).toHaveURL(/\/tools\/home-sale-net-proceeds-calculator$/);
+  expect(page.url()).not.toContain("15900");
+  await expect(page.getByRole("status")).toContainText("$15,900.00 was applied to Repair and list");
+  await expect(page.getByLabel("Estimated carrying costs").first()).toHaveValue("15900");
+  await expect(page.getByLabel("Estimated carrying costs").last()).toHaveValue("1000");
+  expect(await page.evaluate(() => window.sessionStorage.getItem("smkh_carrying_cost_transfer"))).toBeNull();
+  await page.getByLabel("Estimated carrying costs").first().fill("16000");
+  await expect(page.getByLabel("Estimated carrying costs").first()).toHaveValue("16000");
+  await page.getByRole("button", { name: "Reset Example" }).click();
+  await expect(page.getByLabel("Estimated carrying costs").first()).toHaveValue("3000");
+  await expect(page.getByLabel("Estimated carrying costs").last()).toHaveValue("1000");
+
+  await page.goto("/tools/home-carrying-cost-calculator");
+  for (const label of ["Monthly mortgage payment", "Monthly property taxes", "Monthly homeowners insurance", "Monthly utilities", "Monthly maintenance", "Other monthly costs"]) await page.getByRole("spinbutton", { name: label, exact: true }).fill("0");
+  await expect(page.getByTestId("monthly-carrying-total")).toHaveText("$0.00");
+  await expect(page.getByTestId("holding-cost-total")).toHaveText("$0.00");
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+  const results = await new AxeBuilder({ page }).include(".carrying-shell").withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   expect(results.violations.filter((item) => ["serious", "critical"].includes(item.impact))).toEqual([]);
 });
 

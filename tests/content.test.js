@@ -7,7 +7,7 @@ const root = path.resolve(import.meta.dirname, "..");
 const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 
 test("all required public routes exist", () => {
-  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/privacy-choices/page.js","app/terms/page.js","app/thank-you/page.js","app/tools/home-sale-net-proceeds-calculator/page.js","app/tools/which-selling-option-fits-me/page.js"];
+  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/privacy-choices/page.js","app/terms/page.js","app/thank-you/page.js","app/tools/home-sale-net-proceeds-calculator/page.js","app/tools/home-carrying-cost-calculator/page.js","app/tools/which-selling-option-fits-me/page.js"];
   for (const route of routes) assert.equal(fs.existsSync(path.join(root, route)), true, route);
 });
 test("admin login provides an accessible password visibility control", () => {
@@ -73,7 +73,7 @@ test("approved as-is article includes the authorized comparison, guidance, and r
   assert.match(route, /SHORT_DISCLOSURE_TEXT/);
   assert.match(route, /metadata\.title = \{ absolute: article\.metaTitle \}/);
 });
-test("net proceeds calculator is indexable, linked, structured, and non-persistent", () => {
+test("net proceeds calculator is indexable, linked, structured, and accepts only the session transfer", () => {
   const page = read("app/tools/home-sale-net-proceeds-calculator/page.js");
   const calculator = read("components/NetProceedsCalculator.js");
   const sitemap = read("app/sitemap.js");
@@ -92,7 +92,8 @@ test("net proceeds calculator is indexable, linked, structured, and non-persiste
   assert.match(calculator, /<summary>View calculation details<\/summary>/);
   assert.match(sitemap, /\/tools\/home-sale-net-proceeds-calculator/);
   for (const source of [article, sellerPages, insights]) assert.match(source, /\/tools\/home-sale-net-proceeds-calculator/);
-  assert.doesNotMatch(calculator, /fetch\(|localStorage|sessionStorage|supabase|email/i);
+  assert.doesNotMatch(calculator, /fetch\(|localStorage|supabase|email/i);
+  assert.match(calculator, /window\.sessionStorage\.getItem\(CARRYING_COST_TRANSFER_KEY\)/);
 });
 test("selling options quiz is indexable, linked, private by default, and structured", () => {
   const page = read("app/tools/which-selling-option-fits-me/page.js");
@@ -117,6 +118,28 @@ test("selling options quiz is indexable, linked, private by default, and structu
   assert.match(rules, /return \{ key: "compare"/);
   assert.match(sitemap, /\/tools\/which-selling-option-fits-me/);
   for (const source of [homepage, situations, calculator, insights]) assert.match(source, /\/tools\/which-selling-option-fits-me/);
+});
+test("home carrying cost calculator is indexable, linked, structured, and browser-only", () => {
+  const page = read("app/tools/home-carrying-cost-calculator/page.js");
+  const calculator = read("components/CarryingCostCalculator.js");
+  const math = read("lib/carrying-costs.js");
+  const netCalculator = read("components/NetProceedsCalculator.js");
+  const netPage = read("app/tools/home-sale-net-proceeds-calculator/page.js");
+  const quizPage = read("app/tools/which-selling-option-fits-me/page.js");
+  const insights = read("app/insights/page.js");
+  const sitemap = read("app/sitemap.js");
+  assert.match(page, /Home Carrying Cost Calculator \| Bakersfield & Kern County/);
+  assert.match(page, /path = "\/tools\/home-carrying-cost-calculator"/);
+  assert.match(page, /"@type": "WebApplication"/);
+  assert.match(page, /hypothetical examples?—not Bakersfield averages/i);
+  assert.match(calculator, /Use These Costs in Net Proceeds Calculator/);
+  assert.match(calculator, /window\.sessionStorage\.setItem\(CARRYING_COST_TRANSFER_KEY/);
+  assert.doesNotMatch(calculator, /fetch\(|supabase|localStorage|URLSearchParams/);
+  assert.match(netCalculator, /window\.sessionStorage\.removeItem\(CARRYING_COST_TRANSFER_KEY\)/);
+  assert.match(netCalculator, /Carrying cost imported/);
+  assert.match(math, /monthlyTotal \* months/);
+  assert.match(sitemap, /\/tools\/home-carrying-cost-calculator/);
+  for (const source of [netPage, quizPage, insights]) assert.match(source, /\/tools\/home-carrying-cost-calculator/);
 });
 test("reviewed seller landing pages are eligible only behind the master indexing gate", () => {
   const pages = read("content/seller-pages.js");
@@ -315,6 +338,15 @@ test("selling quiz analytics are consent-gated and contain no answer values", ()
   assert.match(quiz, /track\("selling_quiz_start", \{ location: "selling_options_quiz" \}\)/);
   assert.match(quiz, /track\("selling_quiz_complete", \{ location: "selling_options_quiz" \}\)/);
   assert.doesNotMatch(quiz, /track\([^\n]*(?:condition|timeline|inheritance|occupancy|mortgage|priority)/);
+});
+test("carrying calculator analytics are consent-gated and contain no financial values", () => {
+  const analytics = read("lib/analytics.js");
+  const calculator = read("components/CarryingCostCalculator.js");
+  for (const event of ["carrying_calculator_view", "carrying_calculator_interaction", "carrying_calculator_transfer"]) assert.match(analytics, new RegExp(event));
+  assert.match(calculator, /track\("carrying_calculator_view", \{ location: "carrying_cost_calculator" \}\)/);
+  assert.match(calculator, /track\("carrying_calculator_interaction", \{ location: "carrying_cost_calculator" \}\)/);
+  assert.match(calculator, /track\("carrying_calculator_transfer", \{ location: "carrying_cost_calculator", destination: "\/tools\/home-sale-net-proceeds-calculator" \}\)/);
+  assert.doesNotMatch(calculator, /track\([^\n]*(?:mortgage|propertyTaxes|insurance|utilities|maintenance|holdingTotal|months)/);
 });
 test("seller funnel uses the approved non-PII event taxonomy", () => {
   const form = read("components/PropertyForm.js");

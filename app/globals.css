@@ -2228,6 +2228,249 @@ summary:focus-visible {
   font-size: 0.82rem;
 }
 
+/* Home carrying cost calculator */
+.calculator-transfer-notice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 18px 24px 0;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--forest);
+  border-radius: 11px;
+  background: var(--sage-light);
+  padding: 12px 15px;
+  font-size: 0.78rem;
+}
+.calculator-transfer-notice button {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: var(--forest);
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.carrying-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.75fr);
+  gap: 18px;
+  padding: 20px 24px;
+}
+.carrying-inputs {
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 15px 18px 18px;
+}
+.carrying-inputs > legend {
+  padding: 0 6px;
+  color: var(--forest);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+.carrying-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+.carrying-page .calculator-field {
+  gap: 4px;
+  margin-bottom: 0;
+  font-size: 0.75rem;
+}
+.carrying-page .calculator-field input[type="number"] {
+  min-height: 44px;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+}
+.holding-period {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 13px;
+}
+.holding-period > label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.holding-period > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 150px;
+  align-items: center;
+  gap: 14px;
+}
+.holding-period input[type="range"] {
+  width: 100%;
+  min-height: 44px;
+  accent-color: var(--forest);
+}
+.holding-period > div > span {
+  display: flex;
+  align-items: center;
+  border: 1px solid #9eb1a7;
+  border-radius: 10px;
+  background: var(--white);
+  overflow: hidden;
+}
+.holding-period input[type="number"] {
+  width: 65px;
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  padding: 8px 10px;
+  font-weight: 700;
+}
+.holding-period > div > span > span {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.carrying-results {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #f4f7f3;
+  padding: 18px;
+}
+.carrying-results .eyebrow {
+  margin-bottom: 8px;
+}
+.carrying-totals {
+  display: grid;
+  gap: 10px;
+}
+.carrying-totals > div {
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--white);
+  padding: 13px;
+}
+.carrying-totals span {
+  display: block;
+  color: var(--body);
+  font-size: 0.67rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.carrying-totals strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--forest);
+  font-size: clamp(1.45rem, 2.8vw, 2rem);
+}
+.carrying-accounting-note {
+  margin: 12px 0 0;
+  border-left: 3px solid var(--brass);
+  background: #fffaf2;
+  padding: 10px 12px;
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+.carrying-breakdown {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.75fr) minmax(0, 1.25fr);
+  gap: 20px;
+  border-top: 1px solid var(--line);
+  padding: 18px 24px;
+}
+.carrying-breakdown h3,
+.carrying-transfer h3 {
+  margin-bottom: 7px;
+  font-size: 1.25rem;
+}
+.carrying-breakdown ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.carrying-breakdown li {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  border-bottom: 1px solid var(--line);
+  padding: 6px 0;
+  font-size: 0.74rem;
+}
+.carrying-chart {
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  border-radius: 12px;
+  background: #f4f7f3;
+  padding: 13px;
+}
+.carrying-chart > div {
+  display: grid;
+  grid-template-columns: 155px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+.carrying-bar-track {
+  height: 11px;
+  border-radius: 999px;
+  background: var(--sage);
+  overflow: hidden;
+}
+.carrying-bar {
+  display: block;
+  min-width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--forest);
+}
+.carrying-shell > .calculator-disclaimer {
+  margin: 0 24px 18px;
+  padding: 10px 13px;
+  font-size: 0.74rem;
+  line-height: 1.5;
+}
+.carrying-transfer {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(260px, 1fr) auto;
+  align-items: end;
+  gap: 18px;
+  border-top: 1px solid var(--line);
+  background: var(--sage-light);
+  padding: 18px 24px;
+}
+.carrying-transfer p {
+  margin: 0;
+  font-size: 0.73rem;
+}
+.carrying-transfer fieldset {
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+}
+.carrying-transfer legend {
+  margin-bottom: 5px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+.carrying-transfer .choice-row {
+  flex-wrap: wrap;
+}
+.carrying-transfer .choice-row label {
+  min-height: 44px;
+  background: var(--white);
+}
+.carrying-transfer .button {
+  min-height: 46px;
+  max-width: 260px;
+}
+.carrying-actions {
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid var(--line);
+  padding: 14px 24px;
+}
+
 /* Selling options quiz */
 .quiz-page .page-hero {
   padding: 32px 0 28px;
@@ -2508,6 +2751,14 @@ summary:focus-visible {
     grid-template-columns: 1fr;
     gap: 24px;
   }
+  .carrying-layout,
+  .carrying-breakdown,
+  .carrying-transfer {
+    grid-template-columns: 1fr;
+  }
+  .carrying-transfer .button {
+    max-width: none;
+  }
 }
 
 @media (max-width: 540px) {
@@ -2582,6 +2833,29 @@ summary:focus-visible {
   .quiz-results .quiz-actions {
     flex-direction: column-reverse;
   }
+  .calculator-transfer-notice,
+  .carrying-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .carrying-layout,
+  .carrying-breakdown,
+  .carrying-transfer {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+  .carrying-field-grid {
+    grid-template-columns: 1fr;
+  }
+  .holding-period > div {
+    grid-template-columns: 1fr;
+  }
+  .carrying-chart > div {
+    grid-template-columns: 120px minmax(0, 1fr);
+  }
+  .carrying-actions .button {
+    width: 100%;
+  }
 }
 
 @media print {
@@ -2592,6 +2866,11 @@ summary:focus-visible {
     display: grid !important;
   }
   .calculator-support {
+    display: none !important;
+  }
+  .carrying-transfer,
+  .carrying-actions,
+  .calculator-transfer-notice {
     display: none !important;
   }
 }
