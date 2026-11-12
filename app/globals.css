@@ -2965,3 +2965,20 @@ summary:focus-visible {
     display: none !important;
   }
 }
+
+.smkh-testimonials { padding-top: clamp(3rem, 6vw, 5.5rem); }
+.smkh-testimonial-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 1rem; }
+.smkh-testimonial { margin: 0; padding: 1.5rem; border: 1px solid #e2e6e3; border-radius: .75rem; background: #fff; }
+.smkh-testimonial blockquote { margin: 0; color: #24352c; line-height: 1.7; }
+.smkh-testimonial figcaption { margin-top: 1rem; color: #68766d; font-size: .9rem; }
+.smkh-content-admin { display: grid; gap: 1.25rem; }
+.smkh-content-admin .admin-panel { display: grid; gap: 1rem; }
+.smkh-content-admin .admin-panel-heading { margin-bottom: 0; }
+.smkh-home-preview { display: block; width: min(100%, 540px); aspect-ratio: 16 / 9; object-fit: cover; border-radius: .6rem; }
+.smkh-content-form { display: grid; gap: .75rem; max-width: 680px; }
+.smkh-content-form label { font-weight: 700; }
+.smkh-content-form input:not([type="file"]), .smkh-content-form textarea, .smkh-content-form select { width: 100%; }
+.smkh-content-form input[type="file"] { max-width: 100%; }
+.smkh-content-form h3 { margin: .5rem 0; }
+.smkh-content-message { padding: .8rem 1rem; border-radius: .5rem; background: #edf4e8; color: #254b2f; }
+@media(max-width:640px) { .smkh-content-admin .admin-lead-row { display: grid; gap: .65rem; } .smkh-content-admin .admin-lead-meta { flex-wrap: wrap; } }

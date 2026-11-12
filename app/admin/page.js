@@ -22,7 +22,7 @@ export default async function AdminPage({ searchParams }) {
       {leadStatuses.map((item) => <Link className={status === item ? "active" : ""} href={`/admin?status=${item}`} key={item}>{statusLabel(item)}</Link>)}
     </nav>
     <section className="admin-panel">
-      <div className="admin-panel-heading"><div><h2>{status ? statusLabel(status) : "All leads"}</h2><p>{leads.length} record{leads.length === 1 ? "" : "s"}</p></div><div className="admin-heading-links"><Link className="text-link" href="/admin/privacy-requests">Privacy requests</Link><Link className="text-link" href="/admin/property-intelligence">PI demonstration</Link></div></div>
+      <div className="admin-panel-heading"><div><h2>{status ? statusLabel(status) : "All leads"}</h2><p>{leads.length} record{leads.length === 1 ? "" : "s"}</p></div><div className="admin-heading-links"><Link className="text-link" href="/admin/content">Site content</Link><Link className="text-link" href="/admin/privacy-requests">Privacy requests</Link><Link className="text-link" href="/admin/property-intelligence">PI demonstration</Link></div></div>
       {leads.length ? <div className="admin-lead-list">{leads.map((lead) => <Link href={`/admin/leads/${lead.id}`} className="admin-lead-row" key={lead.id}>
         <div><strong>{lead.first_name} {lead.last_name}</strong><span>{lead.property_address}, {lead.property_city} {lead.property_zip}</span><small>{lead.reference}</small></div>
         <div className="admin-lead-meta"><span className={`status-pill status-${lead.status}`}>{statusLabel(lead.status)}</span><span><CalendarClock size={15} /> {formatDate(lead.follow_up_at)}</span>{lead.archived_at ? <span>Historical archived record</span> : null}</div>

@@ -18,6 +18,7 @@ export default function PrivacyPage() {
 
       <h2>How website inquiry information is used</h2>
       <p>Information is used to provide, review and respond to your property inquiry; maintain authorized follow-up, consent and audit records; honor privacy and contact preferences; prevent abuse and duplicate submissions; protect the service; and understand aggregate site performance when analytics consent is granted.</p>
+      <p>Website inquiry details are stored for authorized administrators to review and follow up using the contact method you choose. Public testimonials, if any, are published only after an authorized administrator marks them as published.</p>
       <p>If you separately authorize sharing, an identified approved independent wholesaler or investor may receive the contact and property information needed to evaluate whether it wishes to contact you. Such a company may pay Workside Software a flat fee per contact regardless of whether you speak with it, sign a contract, sell, or close. Workside does not receive a portion of your sale proceeds, and its fee does not depend on the price you receive.</p>
       <p>External partner delivery is currently disabled. Submission alone does not authorize sharing. Delivery requires an affirmative sharing choice, an identified approved recipient, an active delivery workflow, and no active do-not-sell-or-share suppression.</p>
 
