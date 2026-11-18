@@ -20,7 +20,7 @@ export const situations = [
     intro: "A vacant home still needs attention. Insurance, maintenance, utilities, security, and travel can all shape what a practical next step looks like.",
     points: ["Current insurance and utility status", "Security, yard care, and periodic property checks", "Known damage or deferred maintenance", "Access arrangements for any future inspection or walkthrough"],
     note: "Avoid sharing access codes, keys, or sensitive security details through this website.",
-    related: [["/sell-house-needs-repairs-bakersfield", "Organize repair and condition questions"], ["/sell-house-as-is-bakersfield", "Review as-is sale considerations"], ["/how-it-works", "See how a private inquiry works"]] },
+    related: [["/sell-vacant-house-bakersfield", "Bakersfield vacant-home records and planning checklist"], ["/sell-house-needs-repairs-bakersfield", "Organize repair and condition questions"], ["/sell-house-as-is-bakersfield", "Review as-is sale considerations"], ["/how-it-works", "See how a private inquiry works"]] },
   { slug: "relocating", href: "/selling-situations/relocating", title: "Relocating", short: "Plan around your move, property readiness, and decision timeline.", icon: Truck,
     pageTitle: "Selling a Bakersfield Home When Relocating",
     metaTitle: "Sell a Bakersfield Home When Relocating",

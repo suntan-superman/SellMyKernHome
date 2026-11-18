@@ -6,10 +6,10 @@ const coreRoutes = ["", "/how-it-works", "/selling-situations", "/about", "/faq"
 
 export default function sitemap() {
   if (!isIndexingEnabled()) return [];
-  const dated = (path, priority = 0.7) => ({ url: `${SITE_URL}${path}`, lastModified: "2026-11-01", changeFrequency: path === "" ? "weekly" : "monthly", priority: path === "" ? 1 : priority });
+  const dated = (path, priority = 0.7, lastModified = "2026-11-01") => ({ url: `${SITE_URL}${path}`, lastModified, changeFrequency: path === "" ? "weekly" : "monthly", priority: path === "" ? 1 : priority });
   return [
     ...coreRoutes.map((route) => dated(route)),
-    ...Object.entries(sellerPages).filter(([, page]) => page.approvedForIndexing).map(([slug]) => dated(`/${slug}`, 0.8)),
+    ...Object.entries(sellerPages).filter(([, page]) => page.approvedForIndexing).map(([slug, page]) => dated(`/${slug}`, 0.8, page.updated ?? "2026-11-01")),
     ...articles.filter((article) => article.approvedForIndexing).map((article) => ({ url: `${SITE_URL}/insights/${article.slug}`, lastModified: article.updated, changeFrequency: "monthly", priority: 0.65 })),
   ];
 }

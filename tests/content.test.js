@@ -7,7 +7,7 @@ const root = path.resolve(import.meta.dirname, "..");
 const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 
 test("all required public routes exist", () => {
-  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/privacy-choices/page.js","app/terms/page.js","app/thank-you/page.js","app/tools/home-sale-net-proceeds-calculator/page.js","app/tools/home-carrying-cost-calculator/page.js","app/tools/which-selling-option-fits-me/page.js"];
+  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/sell-vacant-house-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/privacy-choices/page.js","app/terms/page.js","app/thank-you/page.js","app/tools/home-sale-net-proceeds-calculator/page.js","app/tools/home-carrying-cost-calculator/page.js","app/tools/which-selling-option-fits-me/page.js"];
   for (const route of routes) assert.equal(fs.existsSync(path.join(root, route)), true, route);
 });
 test("admin login provides an accessible password visibility control", () => {
@@ -148,9 +148,9 @@ test("home carrying cost calculator is indexable, linked, structured, and browse
 test("reviewed seller landing pages are eligible only behind the master indexing gate", () => {
   const pages = read("content/seller-pages.js");
   const sitemap = read("app/sitemap.js");
-  assert.equal((pages.match(/approvedForIndexing: true/g) || []).length, 5);
+  assert.equal((pages.match(/approvedForIndexing: true/g) || []).length, 6);
   const sellerTitles = [...pages.matchAll(/metaTitle: "([^"]+)"/g)].map((match) => match[1]);
-  assert.equal(sellerTitles.length, 5);
+  assert.equal(sellerTitles.length, 6);
   for (const title of sellerTitles) assert.ok(title.length <= 42, `${title} is too long before the site-name suffix`);
   assert.doesNotMatch(pages, /approvedForIndexing: false/);
   assert.match(sitemap, /if \(!isIndexingEnabled\(\)\) return \[\]/);
@@ -180,6 +180,15 @@ test("Bakersfield option comparison is substantive and preserves claim boundarie
   assert.match(component, /scope="row"/);
   assert.match(component, /does not state that SMKH is a cash buyer/);
   assert.doesNotMatch(pages, /close in (?:as little as )?\d|offer (?:today|within \d)|no (?:fees|commissions|closing costs)/i);
+});
+test("vacant Bakersfield home page uses local records, practical planning, and existing seller resources", () => {
+  const pages = read("content/seller-pages.js");
+  const route = read("app/sell-vacant-house-bakersfield/page.js");
+  const sitemap = read("app/sitemap.js");
+  assert.match(pages, /"sell-vacant-house-bakersfield": \{[\s\S]*?approvedForIndexing: true[\s\S]*?updated: "2026-11-18"/);
+  for (const value of ["Kern County's Assessor Property Search", "the County's Property Tax Portal", "City of Bakersfield Development Center", "https://www.kerncounty.com/government/departments/assessor-recorder/property/assessor-property-search", "https://www.kerncounty.com/services/property-land-and-taxes/property-tax-portal", "https://www.bakersfieldcity.us/development-center", "/selling-situations/vacant-property", "/selling-situations/relocating", "/tools/home-carrying-cost-calculator", "not a home buyer or real estate brokerage"]) assert.ok(pages.includes(value), value);
+  assert.match(route, /path: "\/sell-vacant-house-bakersfield"/);
+  assert.match(sitemap, /map\(\(\[slug, page\]\) => dated\(`\/\$\{slug\}`, 0\.8, page\.updated/);
 });
 test("public role disclosures describe the approved service without implying a transaction role", () => {
   const publicCopy = `${read("app/page.js")}\n${read("app/about/page.js")}\n${read("app/contact/page.js")}\n${read("components/PropertyForm.js")}\n${read("components/SellerLandingPage.js")}\n${read("lib/site.js")}`;
