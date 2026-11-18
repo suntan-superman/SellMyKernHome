@@ -7,7 +7,7 @@ const root = path.resolve(import.meta.dirname, "..");
 const read = (relative) => fs.readFileSync(path.join(root, relative), "utf8");
 
 test("all required public routes exist", () => {
-  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/sell-vacant-house-bakersfield/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/privacy-choices/page.js","app/terms/page.js","app/thank-you/page.js","app/tools/home-sale-net-proceeds-calculator/page.js","app/tools/home-carrying-cost-calculator/page.js","app/tools/which-selling-option-fits-me/page.js"];
+  const routes = ["app/page.js","app/how-it-works/page.js","app/selling-situations/page.js","app/sell-your-house-bakersfield/page.js","app/sell-house-as-is-bakersfield/page.js","app/sell-inherited-house-bakersfield/page.js","app/sell-house-needs-repairs-bakersfield/page.js","app/sell-rental-property-bakersfield/page.js","app/sell-vacant-house-bakersfield/page.js","app/sell-house-oildale/page.js","app/sell-house-rosedale/page.js","app/about/page.js","app/faq/page.js","app/contact/page.js","app/privacy-policy/page.js","app/privacy-choices/page.js","app/terms/page.js","app/thank-you/page.js","app/tools/home-sale-net-proceeds-calculator/page.js","app/tools/home-carrying-cost-calculator/page.js","app/tools/which-selling-option-fits-me/page.js"];
   for (const route of routes) assert.equal(fs.existsSync(path.join(root, route)), true, route);
 });
 test("admin login provides an accessible password visibility control", () => {
@@ -148,9 +148,9 @@ test("home carrying cost calculator is indexable, linked, structured, and browse
 test("reviewed seller landing pages are eligible only behind the master indexing gate", () => {
   const pages = read("content/seller-pages.js");
   const sitemap = read("app/sitemap.js");
-  assert.equal((pages.match(/approvedForIndexing: true/g) || []).length, 6);
+  assert.equal((pages.match(/approvedForIndexing: true/g) || []).length, 8);
   const sellerTitles = [...pages.matchAll(/metaTitle: "([^"]+)"/g)].map((match) => match[1]);
-  assert.equal(sellerTitles.length, 6);
+  assert.equal(sellerTitles.length, 8);
   for (const title of sellerTitles) assert.ok(title.length <= 42, `${title} is too long before the site-name suffix`);
   assert.doesNotMatch(pages, /approvedForIndexing: false/);
   assert.match(sitemap, /if \(!isIndexingEnabled\(\)\) return \[\]/);
@@ -189,6 +189,22 @@ test("vacant Bakersfield home page uses local records, practical planning, and e
   for (const value of ["Kern County's Assessor Property Search", "the County's Property Tax Portal", "City of Bakersfield Development Center", "https://www.kerncounty.com/government/departments/assessor-recorder/property/assessor-property-search", "https://www.kerncounty.com/services/property-land-and-taxes/property-tax-portal", "https://www.bakersfieldcity.us/development-center", "/selling-situations/vacant-property", "/selling-situations/relocating", "/tools/home-carrying-cost-calculator", "not a home buyer or real estate brokerage"]) assert.ok(pages.includes(value), value);
   assert.match(route, /path: "\/sell-vacant-house-bakersfield"/);
   assert.match(sitemap, /map\(\(\[slug, page\]\) => dated\(`\/\$\{slug\}`, 0\.8, page\.updated/);
+});
+test("Oildale and Rosedale seller guides are locally distinct and preserve the lead-generation role", () => {
+  const pages = read("content/seller-pages.js");
+  const routeOildale = read("app/sell-house-oildale/page.js");
+  const routeRosedale = read("app/sell-house-rosedale/page.js");
+  for (const item of ["sell-house-oildale", "sell-house-rosedale"]) assert.match(pages, new RegExp(`"${item}": \\{[\\s\\S]*?approvedForIndexing: true`));
+  assert.match(pages, /Kern County lists Oildale among its unincorporated communities/);
+  assert.match(pages, /Kern County includes Rosedale on its list of unincorporated communities/);
+  assert.match(pages, /some unincorporated addresses sit within city limits/);
+  assert.match(pages, /deed or trust documents/);
+  assert.match(pages, /easements, shared access/);
+  assert.match(pages, /if applicable/);
+  assert.match(pages, /not buy homes, provide brokerage services, or represent sellers/);
+  for (const href of ["/sell-vacant-house-bakersfield", "/sell-house-needs-repairs-bakersfield"]) assert.ok(pages.includes(href), href);
+  assert.ok(routeOildale.includes('path: "/sell-house-oildale"'));
+  assert.ok(routeRosedale.includes('path: "/sell-house-rosedale"'));
 });
 test("public role disclosures describe the approved service without implying a transaction role", () => {
   const publicCopy = `${read("app/page.js")}\n${read("app/about/page.js")}\n${read("app/contact/page.js")}\n${read("components/PropertyForm.js")}\n${read("components/SellerLandingPage.js")}\n${read("lib/site.js")}`;
@@ -402,4 +418,6 @@ test("seller endpoint validates before server-side lead creation", () => {
   assert.match(route, /verifyTurnstile\(input\.turnstileToken, ip\)/);
   assert.match(route, /createSellerLead\(validation\.data, \{ partner \}\)/);
 });
+
+
 

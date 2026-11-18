@@ -157,8 +157,70 @@ export const sellerPages = {
       ["/contact", "Start a private property inquiry"],
     ],
   },
-};
+  "sell-house-oildale": {
+    approvedForIndexing: true,
+    updated: "2026-11-18",
+    title: "Selling a House in Oildale: Records, Condition, and Next Steps",
+    metaTitle: "Sell a House in Oildale",
+    description: "A practical Oildale homeowner guide to confirming property jurisdiction, organizing condition and ownership records, and comparing sale options.",
+    eyebrow: "OILDALE HOMEOWNER GUIDE",
+    intro: "A property decision in Oildale can involve ownership records, home condition, permits, and who is available to coordinate the next steps. Start with the specific property rather than assumptions about the area.",
+    lead: "Kern County lists Oildale among its unincorporated communities, but the County also notes that some unincorporated addresses sit within city limits. Confirm the property's jurisdiction by address before relying on a permit office or service record. Sell My Kern Home is a lead-generation platform operated by Workside Software; it does not buy homes, provide brokerage services, or represent sellers.",
+    considerations: [
+      ["Confirm which agency serves the address", "Use Kern County's address lookup for unincorporated areas and confirm any boundary result with the responsible agency. Jurisdiction affects where to ask about permits and other property records; a community name alone does not establish which office handles a particular parcel."],
+      ["Organize ownership and decision records", "Gather the assessor parcel number, deed or trust documents, recent tax information, loan and insurance contacts, and any agreement affecting occupancy or access. If the owner has moved or the home was inherited, confirm who has authority to make decisions before arranging access or signing anything."],
+      ["Describe the home's actual condition", "Make a dated list of known roof, plumbing, electrical, heating, water, pest, or other concerns. Collect available repair invoices, inspection reports, warranties, and permits. Avoid treating an old estimate or a neighbor's experience as evidence about this property."],
+      ["Plan for an empty or partly cleared home", "If the home is vacant, arrange appropriate checks for leaks, security, utilities, landscaping, and mail. Use actual insurance, utility, tax, loan, and maintenance bills to estimate the cost of waiting."],
+      ["Compare repair, as-is, and timing choices", "For each written path, compare preparation, access, inspections, costs, contingencies, cancellation rights, and possession. A proposed price or closing date is not a guarantee."],
+    ],
+    questions: ["Which public office handles records and permits for this exact address?", "Who is authorized to make decisions and arrange access?", "Which condition items have estimates or records, and which still need inspection?", "What are the documented costs and terms for each available path?"],
+    sources: [
+      ["Kern County: Check whether an address is in unincorporated Kern", "https://www.kerncounty.com/community/measure-k/get-involved/is-my-address-in-unincorporated-kern"],
+      ["Kern County Assessor Property Search", "https://www.kerncounty.com/government/departments/assessor-recorder/property/assessor-property-search"],
+      ["Kern County Property Tax Portal", "https://www.kerncounty.com/services/property-land-and-taxes/property-tax-portal"],
+    ],
+    related: [
+      ["/sell-vacant-house-bakersfield", "Checklist for a vacant Bakersfield or Kern County home"],
+      ["/sell-inherited-house-bakersfield", "Questions when a property is inherited"],
+      ["/sell-house-needs-repairs-bakersfield", "Organize known repair and condition questions"],
+      ["/selling-situations/vacant-property", "Plan for an unoccupied property"],
+      ["/tools/home-carrying-cost-calculator", "Estimate the cost of carrying a home"],
+      ["/contact", "Share property details privately"],
+    ],
+  },
+  "sell-house-rosedale": {
+    approvedForIndexing: true,
+    updated: "2026-11-18",
+    title: "Selling a House in Rosedale: Parcel and Property Checklist",
+    metaTitle: "Sell a House in Rosedale",
+    description: "A Rosedale seller guide for checking property jurisdiction, parcel details, additions, access, and written sale terms before choosing a path.",
+    eyebrow: "ROSEDALE HOMEOWNER GUIDE",
+    intro: "Before selling a Rosedale property, collect the facts that distinguish this parcel: its boundaries, access, improvements, condition, and the public records tied to its address.",
+    lead: "Kern County includes Rosedale on its list of unincorporated communities and notes that some unincorporated addresses can lie within city limits. Check jurisdiction for the exact parcel before requesting permit or planning information. Sell My Kern Home is a lead-generation platform operated by Workside Software; it does not buy homes, provide brokerage services, or represent sellers.",
+    considerations: [
+      ["Verify the parcel and jurisdiction", "Start with the address and assessor parcel number, then compare the County's unincorporated-area lookup with the appropriate city or County office. Do not infer jurisdiction from a Rosedale mailing address or neighborhood name."],
+      ["Make a property and access inventory", "Gather the deed, available survey or parcel map, recorded easements, driveway or shared-access information, and any agreements affecting use. A parcel map or assessor record is a starting point and does not replace title review or a boundary survey."],
+      ["Document additions and site features", "List the structures and improvements that are actually present, such as additions, a workshop, fencing, irrigation equipment, or a well or septic system if applicable. Collect permits, plans, service records, and repair receipts where available; ask the responsible jurisdiction what records it maintains."],
+      ["Separate verified work from planned work", "Photograph current condition and group items into completed repairs, known issues, and optional projects. Obtain independent estimates only where they would help compare preparation with an as-is path."],
+      ["Compare access, costs, and possession in writing", "Clarify who may enter, what inspections are expected, which costs or repairs may be requested, how belongings or occupants are handled, and what contingencies apply. Treat timing as a proposal until contract terms and third-party steps are satisfied."],
+    ],
+    questions: ["Which office has jurisdiction over this parcel and its permits?", "Do any easements, shared access, or recorded agreements affect the property?", "Are improvements documented, and which details still need professional review?", "How do preparation, access, costs, contingencies, and possession compare in writing?"],
+    sources: [
+      ["Kern County: Check whether an address is in unincorporated Kern", "https://www.kerncounty.com/community/measure-k/get-involved/is-my-address-in-unincorporated-kern"],
+      ["Kern County Assessor Property Search", "https://www.kerncounty.com/government/departments/assessor-recorder/property/assessor-property-search"],
+      ["City of Bakersfield Development Center permit search", "https://www.bakersfieldcity.us/development-center?contentId=59c495e6-35ea-46e3-8bca-89ecf2b2bbce"],
+    ],
+    related: [
+      ["/sell-vacant-house-bakersfield", "Vacant-home records, upkeep, and carrying costs"],
+      ["/sell-house-needs-repairs-bakersfield", "Questions for a home that needs repairs"],
+      ["/sell-house-as-is-bakersfield", "Compare an as-is sale with other options"],
+      ["/selling-situations/relocating", "Plan around a move or relocation"],
+      ["/tools/home-sale-net-proceeds-calculator", "Compare potential net proceeds"],
+      ["/contact", "Share property details privately"],
+    ],
+  },};
 
 export function getSellerPage(slug) {
   return sellerPages[slug];
 }
+
