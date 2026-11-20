@@ -1,6 +1,7 @@
 export const sellerPages = {
   "sell-your-house-bakersfield": {
     approvedForIndexing: true,
+    updated: "2026-11-20",
     title: "Sell Your House in Bakersfield: Start by Comparing Your Options",
     metaTitle: "Sell Your House in Bakersfield",
     description: "A practical starting point for Bakersfield homeowners comparing how to sell, what to prepare, and which questions to ask before choosing a path.",
@@ -29,6 +30,9 @@ export const sellerPages = {
     questions: ["Who is the proposed buyer or representative, and what role are they performing?", "What inspections, contingencies, or approvals remain?", "Which costs would I be expected to pay?", "May I have independent legal, tax, or real-estate advice before signing?"],
     sources: [["California Department of Real Estate: Disclosures in Real Property Transactions", "https://www.dre.ca.gov/files/pdf/re6.pdf"]],
     related: [
+      ["/sell-house-oildale", "Oildale records and local property questions"],
+      ["/sell-house-rosedale", "Rosedale parcel and property checklist"],
+      ["/sell-vacant-house-bakersfield", "Plan for an empty Bakersfield or Kern County home"],
       ["/sell-house-as-is-bakersfield", "Selling a Bakersfield house as-is"],
       ["/sell-rental-property-bakersfield", "Planning a rental or tenant-occupied sale"],
       ["/selling-situations/vacant-property", "Questions for a vacant Kern County home"],
@@ -127,6 +131,8 @@ export const sellerPages = {
       ["City of Bakersfield Development Center", "https://www.bakersfieldcity.us/development-center?contentId=59c495e6-35ea-46e3-8bca-89ecf2b2bbce"],
     ],
     related: [
+      ["/sell-house-oildale", "Oildale records, condition, and next steps"],
+      ["/sell-house-rosedale", "Rosedale parcel and property checklist"],
       ["/selling-situations/vacant-property", "General planning for a vacant property"],
       ["/selling-situations/relocating", "Planning around a move or relocation"],
       ["/sell-house-needs-repairs-bakersfield", "Options when a Bakersfield home needs repairs"],
@@ -159,7 +165,7 @@ export const sellerPages = {
   },
   "sell-house-oildale": {
     approvedForIndexing: true,
-    updated: "2026-11-18",
+    updated: "2026-11-20",
     title: "Selling a House in Oildale: Records, Condition, and Next Steps",
     metaTitle: "Sell a House in Oildale",
     description: "A practical Oildale homeowner guide to confirming property jurisdiction, organizing condition and ownership records, and comparing sale options.",
@@ -180,7 +186,9 @@ export const sellerPages = {
       ["Kern County Property Tax Portal", "https://www.kerncounty.com/services/property-land-and-taxes/property-tax-portal"],
     ],
     related: [
+      ["/sell-your-house-bakersfield", "Compare Bakersfield home-selling options"],
       ["/sell-vacant-house-bakersfield", "Checklist for a vacant Bakersfield or Kern County home"],
+      ["/sell-house-rosedale", "Rosedale parcel and property checklist"],
       ["/sell-inherited-house-bakersfield", "Questions when a property is inherited"],
       ["/sell-house-needs-repairs-bakersfield", "Organize known repair and condition questions"],
       ["/selling-situations/vacant-property", "Plan for an unoccupied property"],
@@ -190,7 +198,7 @@ export const sellerPages = {
   },
   "sell-house-rosedale": {
     approvedForIndexing: true,
-    updated: "2026-11-18",
+    updated: "2026-11-20",
     title: "Selling a House in Rosedale: Parcel and Property Checklist",
     metaTitle: "Sell a House in Rosedale",
     description: "A Rosedale seller guide for checking property jurisdiction, parcel details, additions, access, and written sale terms before choosing a path.",
@@ -211,7 +219,9 @@ export const sellerPages = {
       ["City of Bakersfield Development Center permit search", "https://www.bakersfieldcity.us/development-center?contentId=59c495e6-35ea-46e3-8bca-89ecf2b2bbce"],
     ],
     related: [
+      ["/sell-your-house-bakersfield", "Compare Bakersfield home-selling options"],
       ["/sell-vacant-house-bakersfield", "Vacant-home records, upkeep, and carrying costs"],
+      ["/sell-house-oildale", "Oildale records, condition, and next steps"],
       ["/sell-house-needs-repairs-bakersfield", "Questions for a home that needs repairs"],
       ["/sell-house-as-is-bakersfield", "Compare an as-is sale with other options"],
       ["/selling-situations/relocating", "Plan around a move or relocation"],
