@@ -16,6 +16,11 @@ const nextConfig = {
   poweredByHeader: false,
   allowedDevOrigins: ["127.0.0.1"],
   turbopack: { root: projectRoot },
+  images: {
+    // The admin-configurable homepage hero image is stored in Supabase Storage.
+    // Allow Next.js to optimize it (resize/WebP/AVIF) instead of serving it unoptimized.
+    remotePatterns: [{ protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" }],
+  },
   async headers() {
     const privateIndexingHeaders = [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }];
     return [
